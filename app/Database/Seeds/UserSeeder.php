@@ -3,102 +3,44 @@
 namespace App\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
-use CodeIgniter\I18n\Time;
 
 class UserSeeder extends Seeder
 {
     public function run()
     {
-        $users = [
-            // Admin user
-            [
-                'email' => 'layan@lms.edu',
-                'password' => password_hash('admin123', PASSWORD_DEFAULT),
-                'first_name' => 'System',
-                'last_name' => 'Admin',
-                'role' => 'admin',
-                'created_at' => Time::now(),
-                'updated_at' => Time::now(),
-            ],
-            // Instructor users
-            [
-                'email' => 'sir jim@lms.edu',
-                'password' => password_hash('instructor123', PASSWORD_DEFAULT),
-                'first_name' => 'Jim',
-                'last_name' => 'Jamero',
-                'role' => 'instructor',
-                'created_at' => Time::now(),
-                'updated_at' => Time::now(),
-            ],
-            [
-                'email' => 'Sir Erick@lms.edu',
-                'password' => password_hash('instructor123', PASSWORD_DEFAULT),
-                'first_name' => 'Erick',
-                'last_name' => 'Ric',
-                'role' => 'instructor',
-                'created_at' => Time::now(),
-                'updated_at' => Time::now(),
-            ],
-            // Student users
-            [
-                'email' => 'Xyrl@lms.edu',
-                'password' => password_hash('student123', PASSWORD_DEFAULT),
-                'first_name' => 'Racaza',
-                'last_name' => 'xyrl',
-                'role' => 'student',
-                'created_at' => Time::now(),
-                'updated_at' => Time::now(),
-            ],
-            [
-                'email' => 'jerald@lms.edu',
-                'password' => password_hash('student123', PASSWORD_DEFAULT),
-                'first_name' => 'MACA',
-                'last_name' => 'JERALD',
-                'role' => 'student',
-                'created_at' => Time::now(),
-                'updated_at' => Time::now(),
-            ],
-            [
-                'email' => 'Gomez@lms.edu',
-                'password' => password_hash('student123', PASSWORD_DEFAULT),
-                'first_name' => 'Mirai',
-                'last_name' => 'gomez',
-                'role' => 'student',
-                'created_at' => Time::now(),
-                'updated_at' => Time::now(),
-            ],
-        ];
+        // Empty enrollments first (to avoid FK error)
+        $this->db->table('enrollments')->emptyTable();
 
-        $this->db->table('users')->insertBatch($users);
-        
-        echo "Successfully seeded users table.\n";
+        // Empty users next
+        $this->db->table('users')->emptyTable();
+
         $data = [
             [
-                'name'     => 'Layan, Johnrey',
-                'email'    => 'johnreylayan@gmail.com',
-                'password' => password_hash('admin123', PASSWORD_DEFAULT),
-                'role'     => 'admin'
+                'email'      => 'racazaxyrl@example.com',
+                'password'   => password_hash('admin123', PASSWORD_DEFAULT),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'name'     => 'Jim Jamero',
-                'email'    => 'Jamero@gmail.com',
-                'password' => password_hash('instructor123', PASSWORD_DEFAULT),
-                'role'     => 'instructor'
+                'email'      => 'layan@example.com',
+                'password'   => password_hash('student123', PASSWORD_DEFAULT),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'name'     => 'Xyrl Racaza',
-                'email'    => 'Racaza@gmail.com',
-                'password' => password_hash('student123', PASSWORD_DEFAULT),
-                'role'     => 'student'
+                'email'      => 'maranan@example.com',
+                'password'   => password_hash('student123', PASSWORD_DEFAULT),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'name'     => 'Crisandy Gomez',
-                'email'    => 'Crisandy@gmail.com',
-                'password' => password_hash('student123', PASSWORD_DEFAULT),
-                'role'     => 'student'
+                'email'      => 'jimjamero@example.com',
+                'password'   => password_hash('instructor123', PASSWORD_DEFAULT),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
             ],
         ];
 
-        // Insert all data in one go
-        $this->db->table('users')->insertBatch($data);    }
+        $this->db->table('users')->insertBatch($data);
+    }
 }

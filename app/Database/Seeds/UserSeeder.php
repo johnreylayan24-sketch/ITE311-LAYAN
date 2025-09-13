@@ -8,39 +8,24 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        // Empty enrollments first (to avoid FK error)
-        $this->db->table('enrollments')->emptyTable();
-
-        // Empty users next
-        $this->db->table('users')->emptyTable();
-
         $data = [
             [
-                'email'      => 'racazaxyrl@example.com',
-                'password'   => password_hash('admin123', PASSWORD_DEFAULT),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
+                'name' => 'LAYANZZ',
+                'email' => 'LAYANJOHNRY@gmail.com',
+                'password' => password_hash('admin123', PASSWORD_DEFAULT),
+                'role' => 'admin',
+                'created_at' => date('Y-m-d H:i:s')
             ],
             [
-                'email'      => 'layan@example.com',
-                'password'   => password_hash('student123', PASSWORD_DEFAULT),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
-            [
-                'email'      => 'maranan@example.com',
-                'password'   => password_hash('student123', PASSWORD_DEFAULT),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
-            [
-                'email'      => 'jimjamero@example.com',
-                'password'   => password_hash('instructor123', PASSWORD_DEFAULT),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
+                'name' => 'XYRL RACAZA',
+                'email' => 'RACAZA@gmail.com',
+                'password' => password_hash('2311600073', PASSWORD_DEFAULT),
+                'role' => 'student',
+                'created_at' => date('Y-m-d H:i:s')
+            ]
         ];
 
+        // Insert multiple records
         $this->db->table('users')->insertBatch($data);
     }
 }

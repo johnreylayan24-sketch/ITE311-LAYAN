@@ -27,9 +27,9 @@ class Database extends Config
     public array $default = [
         'DSN'          => '',
         'hostname'     => 'localhost',
-        'username'     => 'root',        // default MySQL user sa XAMPP
-        'password'     => '',            // default walang password
-        'database'     => 'lms_layan',    // pangalan ng database mo
+        'username'     => 'root',
+        'password'     => '',
+        'database'     => 'lms_layan',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,

@@ -205,6 +205,7 @@ class Auth extends BaseController
                     'total_admins' => $this->getUsersByRole('admin'),
                     'total_teachers' => $this->getUsersByRole('teacher'),
                     'total_students' => $this->getUsersByRole('student'),
+                    'total_courses' => $this->getTotalCourses(),
                     'recent_users' => $this->getRecentUsers(),
                     'recent_activities' => $this->getRecentActivities(),
                     'system_stats' => $this->getSystemStats()
@@ -222,7 +223,10 @@ class Auth extends BaseController
                     'my_courses' => $this->getTeacherCourses($userId),
                     'pending_submissions' => $this->getPendingSubmissions($userId),
                     'total_students' => $this->getTeacherStudentsCount($userId),
-                    'recent_grades' => $this->getTeacherRecentGrades($userId)
+                    'recent_grades' => $this->getTeacherRecentGrades($userId),
+                    'total_courses' => count($this->getTeacherCourses($userId)),
+                    'total_assignments' => $this->getTeacherAssignmentsCount($userId),
+                    'pending_submissions_list' => $this->getTeacherPendingSubmissionsList($userId)
                 ];
                 $data['dashboard_title'] = 'Teacher Dashboard';
                 $data['teacher_stats'] = $this->getTeacherStats($userId);
@@ -237,7 +241,10 @@ class Auth extends BaseController
                     'my_courses' => $this->getStudentCourses($userId),
                     'recent_grades' => $this->getStudentGrades($userId),
                     'pending_assignments' => $this->getStudentPendingAssignments($userId),
-                    'overall_gpa' => $this->getStudentGPA($userId)
+                    'overall_gpa' => $this->getStudentGPA($userId),
+                    'enrolled_courses' => count($this->getStudentCourses($userId)),
+                    'completed_assignments' => $this->getStudentCompletedAssignments($userId),
+                    'average_grade' => $this->getStudentGPA($userId)
                 ];
                 $data['dashboard_title'] = 'Student Dashboard';
                 $data['student_stats'] = $this->getStudentStats($userId);
@@ -257,7 +264,7 @@ class Auth extends BaseController
         // Log dashboard access
         $this->logDashboardAccess($userId, $userRole);
 
-        return view('dashboard', $data);
+        return view('auth/dashboard', $data);
     }
 
     /**
@@ -292,34 +299,67 @@ class Auth extends BaseController
         $db = \Config\Database::connect();
         
         if ($userId) {
-            // Real database query for specific student
-            $builder = $db->table('grades');
-            $grades = $builder->where('student_id', $userId)
-                              ->orderBy('created_at', 'DESC')
-                              ->limit(10)
-                              ->get()
-                              ->getResultArray();
-            
-            return $grades ?: [
-                ['assignment' => 'No grades available', 'grade' => 'N/A', 'created_at' => date('Y-m-d H:i:s')]
-            ];
+            // Check if grades and assignments tables exist first
+            if ($db->tableExists('grades') && $db->tableExists('assignments')) {
+                // Real database query for specific student
+                $builder = $db->table('grades');
+                $builder->join('assignments', 'assignments.id = grades.assignment_id', 'left');
+                $grades = $builder->where('grades.student_id', $userId)
+                                  ->select('grades.*, assignments.title as assignment_title, grades.created_at as graded_at')
+                                  ->orderBy('grades.created_at', 'DESC')
+                                  ->limit(10)
+                                  ->get()
+                                  ->getResultArray();
+                
+                // Format the results to ensure required fields exist
+                $formattedGrades = [];
+                foreach ($grades as $grade) {
+                    $formattedGrades[] = [
+                        'grade' => $grade['grade'] ?? 'N/A',
+                        'assignment_title' => $grade['assignment_title'] ?? 'Unknown Assignment',
+                        'graded_at' => $grade['graded_at'] ?? $grade['created_at'] ?? date('Y-m-d H:i:s')
+                    ];
+                }
+                
+                return $formattedGrades ?: [
+                    ['grade' => 'N/A', 'assignment_title' => 'No grades available', 'graded_at' => date('Y-m-d H:i:s')]
+                ];
+            } elseif ($db->tableExists('grades')) {
+                // Only grades table exists, no assignments table
+                $builder = $db->table('grades');
+                $grades = $builder->where('student_id', $userId)
+                                  ->orderBy('created_at', 'DESC')
+                                  ->limit(10)
+                                  ->get()
+                                  ->getResultArray();
+                
+                // Format the results
+                $formattedGrades = [];
+                foreach ($grades as $grade) {
+                    $formattedGrades[] = [
+                        'grade' => $grade['grade'] ?? 'N/A',
+                        'assignment_title' => 'Assignment #' . ($grade['assignment_id'] ?? 'Unknown'),
+                        'graded_at' => $grade['created_at'] ?? date('Y-m-d H:i:s')
+                    ];
+                }
+                
+                return $formattedGrades ?: [
+                    ['grade' => 'N/A', 'assignment_title' => 'No grades available', 'graded_at' => date('Y-m-d H:i:s')]
+                ];
+            } else {
+                // Grades table doesn't exist, return fallback data
+                return [
+                    ['grade' => 'N/A', 'assignment_title' => 'No grades available (Grades table not found)', 'graded_at' => date('Y-m-d H:i:s')]
+                ];
+            }
         } else {
             // Fallback for backward compatibility
             return [
-                ['assignment' => 'Midterm Exam', 'grade' => 85],
-                ['assignment' => 'Project Proposal', 'grade' => 92]
+                ['grade' => 'A', 'assignment_title' => 'Web Development Basics', 'graded_at' => date('Y-m-d H:i:s', strtotime('-2 days'))],
+                ['grade' => 'B+', 'assignment_title' => 'Database Design', 'graded_at' => date('Y-m-d H:i:s', strtotime('-5 days'))],
+                ['grade' => 'A-', 'assignment_title' => 'PHP Programming', 'graded_at' => date('Y-m-d H:i:s', strtotime('-1 week'))]
             ];
         }
-    }
-
-    /**
-     * Helper method to get users by role (Admin)
-     */
-    private function getUsersByRole($role)
-    {
-        $db = \Config\Database::connect();
-        $builder = $db->table('users');
-        return $builder->where('role', $role)->countAllResults();
     }
 
     /**
@@ -386,7 +426,6 @@ class Auth extends BaseController
             // Real database query for specific teacher
             $builder = $db->table('courses');
             $courses = $builder->where('teacher_id', $teacherId)
-                              ->where('status', 'active')
                               ->get()
                               ->getResultArray();
             
@@ -410,14 +449,19 @@ class Auth extends BaseController
         $db = \Config\Database::connect();
         
         if ($teacherId) {
-            // Real database query for specific teacher
-            $builder = $db->table('submissions');
-            $builder->join('assignments', 'assignments.id = submissions.assignment_id');
-            $pendingCount = $builder->where('assignments.teacher_id', $teacherId)
-                                   ->where('submissions.status', 'pending')
-                                   ->countAllResults();
-            
-            return $pendingCount;
+            // Check if assignments table exists first
+            if ($db->tableExists('assignments') && $db->tableExists('submissions')) {
+                // Real database query for specific teacher
+                $builder = $db->table('submissions');
+                $builder->join('assignments', 'assignments.id = submissions.assignment_id');
+                $pendingCount = $builder->where('assignments.teacher_id', $teacherId)
+                                       ->countAllResults();
+                
+                return $pendingCount;
+            } else {
+                // Assignments or submissions table doesn't exist, return 0
+                return 0;
+            }
         } else {
             // Fallback for backward compatibility
             return 12;
@@ -433,7 +477,6 @@ class Auth extends BaseController
         $builder = $db->table('enrollments');
         $builder->join('courses', 'courses.id = enrollments.course_id');
         return $builder->where('courses.teacher_id', $teacherId)
-                      ->where('enrollments.status', 'active')
                       ->countAllResults();
     }
 
@@ -443,13 +486,20 @@ class Auth extends BaseController
     private function getTeacherRecentGrades($teacherId)
     {
         $db = \Config\Database::connect();
-        $builder = $db->table('grades');
-        $builder->join('students', 'students.id = grades.student_id');
-        return $builder->where('grades.teacher_id', $teacherId)
-                      ->orderBy('grades.created_at', 'DESC')
-                      ->limit(5)
-                      ->get()
-                      ->getResultArray();
+        
+        // Check if grades table exists first
+        if ($db->tableExists('grades')) {
+            $builder = $db->table('grades');
+            $builder->join('users', 'users.id = grades.student_id');
+            return $builder->where('grades.teacher_id', $teacherId)
+                          ->orderBy('grades.created_at', 'DESC')
+                          ->limit(5)
+                          ->get()
+                          ->getResultArray();
+        } else {
+            // Grades table doesn't exist, return empty array
+            return [];
+        }
     }
 
     /**
@@ -479,7 +529,6 @@ class Auth extends BaseController
             $builder = $db->table('enrollments');
             $builder->join('courses', 'courses.id = enrollments.course_id');
             $courses = $builder->where('enrollments.student_id', $studentId)
-                              ->where('enrollments.status', 'active')
                               ->get()
                               ->getResultArray();
             
@@ -501,14 +550,21 @@ class Auth extends BaseController
     private function getStudentPendingAssignments($studentId)
     {
         $db = \Config\Database::connect();
-        $builder = $db->table('assignments');
-        $builder->join('enrollments', 'enrollments.course_id = assignments.course_id');
-        $builder->join('submissions', 'submissions.assignment_id = assignments.id AND submissions.student_id = ' . $studentId, 'left');
         
-        return $builder->where('enrollments.student_id', $studentId)
-                      ->where('assignments.due_date >', date('Y-m-d H:i:s'))
-                      ->where('submissions.id IS NULL')
-                      ->countAllResults();
+        // Check if assignments table exists first
+        if ($db->tableExists('assignments') && $db->tableExists('submissions')) {
+            $builder = $db->table('assignments');
+            $builder->join('enrollments', 'enrollments.course_id = assignments.course_id');
+            $builder->join('submissions', 'submissions.assignment_id = assignments.id AND submissions.student_id = ' . $studentId, 'left');
+            
+            return $builder->where('enrollments.student_id', $studentId)
+                          ->where('assignments.due_date >', date('Y-m-d H:i:s'))
+                          ->where('submissions.id IS NULL')
+                          ->countAllResults();
+        } else {
+            // Assignments or submissions table doesn't exist, return 0
+            return 0;
+        }
     }
 
     /**
@@ -517,26 +573,33 @@ class Auth extends BaseController
     private function getStudentGPA($studentId)
     {
         $db = \Config\Database::connect();
-        $builder = $db->table('grades');
-        $grades = $builder->select('grade')
-                         ->where('student_id', $studentId)
-                         ->get()
-                         ->getResultArray();
         
-        if (empty($grades)) {
+        // Check if grades table exists first
+        if ($db->tableExists('grades')) {
+            $builder = $db->table('grades');
+            $grades = $builder->select('grade')
+                             ->where('student_id', $studentId)
+                             ->get()
+                             ->getResultArray();
+            
+            if (empty($grades)) {
+                return 0.0;
+            }
+            
+            $total = 0;
+            $count = 0;
+            foreach ($grades as $grade) {
+                if (is_numeric($grade['grade'])) {
+                    $total += $grade['grade'];
+                    $count++;
+                }
+            }
+            
+            return $count > 0 ? round($total / $count, 2) : 0.0;
+        } else {
+            // Grades table doesn't exist, return 0.0
             return 0.0;
         }
-        
-        $total = 0;
-        $count = 0;
-        foreach ($grades as $grade) {
-            if (is_numeric($grade['grade'])) {
-                $total += $grade['grade'];
-                $count++;
-            }
-        }
-        
-        return $count > 0 ? round($total / $count, 2) : 0.0;
     }
 
     /**
@@ -560,13 +623,20 @@ class Auth extends BaseController
     private function getUserNotifications($userId)
     {
         $db = \Config\Database::connect();
-        $builder = $db->table('notifications');
-        return $builder->where('user_id', $userId)
-                      ->where('is_read', 0)
-                      ->orderBy('created_at', 'DESC')
-                      ->limit(5)
-                      ->get()
-                      ->getResultArray();
+        
+        // Check if notifications table exists first
+        if ($db->tableExists('notifications')) {
+            $builder = $db->table('notifications');
+            return $builder->where('user_id', $userId)
+                          ->where('is_read', 0)
+                          ->orderBy('created_at', 'DESC')
+                          ->limit(5)
+                          ->get()
+                          ->getResultArray();
+        } else {
+            // Notifications table doesn't exist, return empty array
+            return [];
+        }
     }
 
     /**
@@ -576,22 +646,22 @@ class Auth extends BaseController
     {
         $actions = [
             'admin' => [
-                ['icon' => 'fas fa-users', 'label' => 'Manage Users', 'url' => '/admin/users'],
-                ['icon' => 'fas fa-cog', 'label' => 'System Settings', 'url' => '/admin/settings'],
-                ['icon' => 'fas fa-chart-bar', 'label' => 'Analytics', 'url' => '/admin/analytics'],
-                ['icon' => 'fas fa-file-alt', 'label' => 'Reports', 'url' => '/admin/reports']
+                ['icon' => 'fas fa-users', 'label' => 'Manage Users', 'url' => '/admin/users', 'primary' => true],
+                ['icon' => 'fas fa-cog', 'label' => 'System Settings', 'url' => '/admin/settings', 'primary' => false],
+                ['icon' => 'fas fa-chart-bar', 'label' => 'Analytics', 'url' => '/admin/analytics', 'primary' => false],
+                ['icon' => 'fas fa-file-alt', 'label' => 'Reports', 'url' => '/admin/reports', 'primary' => false]
             ],
             'teacher' => [
-                ['icon' => 'fas fa-book', 'label' => 'Course Management', 'url' => '/teacher/courses'],
-                ['icon' => 'fas fa-graduation-cap', 'label' => 'Grade Management', 'url' => '/teacher/grades'],
-                ['icon' => 'fas fa-users', 'label' => 'Student Monitoring', 'url' => '/teacher/students'],
-                ['icon' => 'fas fa-tasks', 'label' => 'Assignments', 'url' => '/teacher/assignments']
+                ['icon' => 'fas fa-book', 'label' => 'Course Management', 'url' => '/teacher/courses', 'primary' => true],
+                ['icon' => 'fas fa-graduation-cap', 'label' => 'Grade Management', 'url' => '/teacher/grades', 'primary' => false],
+                ['icon' => 'fas fa-users', 'label' => 'Student Monitoring', 'url' => '/teacher/students', 'primary' => false],
+                ['icon' => 'fas fa-tasks', 'label' => 'Assignments', 'url' => '/teacher/assignments', 'primary' => false]
             ],
             'student' => [
-                ['icon' => 'fas fa-book-open', 'label' => 'My Courses', 'url' => '/student/courses'],
-                ['icon' => 'fas fa-edit', 'label' => 'Assignments', 'url' => '/student/assignments'],
-                ['icon' => 'fas fa-chart-line', 'label' => 'Grades', 'url' => '/student/grades'],
-                ['icon' => 'fas fa-calendar', 'label' => 'Schedule', 'url' => '/student/schedule']
+                ['icon' => 'fas fa-book-open', 'label' => 'My Courses', 'url' => '/student/courses', 'primary' => true],
+                ['icon' => 'fas fa-edit', 'label' => 'Assignments', 'url' => '/student/assignments', 'primary' => false],
+                ['icon' => 'fas fa-chart-line', 'label' => 'Grades', 'url' => '/student/grades', 'primary' => false],
+                ['icon' => 'fas fa-calendar', 'label' => 'Schedule', 'url' => '/student/schedule', 'primary' => false]
             ]
         ];
         
@@ -604,23 +674,23 @@ class Auth extends BaseController
     private function logDashboardAccess($userId, $role)
     {
         $db = \Config\Database::connect();
-        $builder = $db->table('user_logs');
         
-        $logData = [
-            'user_id' => $userId,
-            'action' => 'dashboard_access',
-            'role' => $role,
-            'ip_address' => $this->request->getIPAddress(),
-            'user_agent' => $this->request->getUserAgent(),
-            'created_at' => date('Y-m-d H:i:s')
-        ];
-        
-        try {
+        // Check if user_logs table exists first
+        if ($db->tableExists('user_logs')) {
+            $builder = $db->table('user_logs');
+            
+            $logData = [
+                'user_id' => $userId,
+                'action' => 'dashboard_access',
+                'role' => $role,
+                'ip_address' => $this->request->getIPAddress(),
+                'user_agent' => $this->request->getUserAgent(),
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+            
             $builder->insert($logData);
-        } catch (\Exception $e) {
-            // Log error but don't break the dashboard
-            log_message('error', 'Failed to log dashboard access: ' . $e->getMessage());
         }
+        // If user_logs table doesn't exist, just skip logging
     }
 
     /**
@@ -726,26 +796,33 @@ class Auth extends BaseController
     private function getTeacherAverageGrade($teacherId)
     {
         $db = \Config\Database::connect();
-        $builder = $db->table('grades');
-        $grades = $builder->select('grade')
-                         ->where('teacher_id', $teacherId)
-                         ->get()
-                         ->getResultArray();
         
-        if (empty($grades)) {
+        // Check if grades table exists first
+        if ($db->tableExists('grades')) {
+            $builder = $db->table('grades');
+            $grades = $builder->select('grade')
+                             ->where('teacher_id', $teacherId)
+                             ->get()
+                             ->getResultArray();
+            
+            if (empty($grades)) {
+                return 0.0;
+            }
+            
+            $total = 0;
+            $count = 0;
+            foreach ($grades as $grade) {
+                if (is_numeric($grade['grade'])) {
+                    $total += $grade['grade'];
+                    $count++;
+                }
+            }
+            
+            return $count > 0 ? round($total / $count, 2) : 0.0;
+        } else {
+            // Grades table doesn't exist, return 0.0
             return 0.0;
         }
-        
-        $total = 0;
-        $count = 0;
-        foreach ($grades as $grade) {
-            if (is_numeric($grade['grade'])) {
-                $total += $grade['grade'];
-                $count++;
-            }
-        }
-        
-        return $count > 0 ? round($total / $count, 2) : 0.0;
     }
 
     /**
@@ -754,9 +831,74 @@ class Auth extends BaseController
     private function getStudentCompletedAssignments($studentId)
     {
         $db = \Config\Database::connect();
-        $builder = $db->table('submissions');
-        return $builder->where('student_id', $studentId)
-                      ->where('status', 'completed')
-                      ->countAllResults();
+        
+        // Check if submissions table exists first
+        if ($db->tableExists('submissions')) {
+            $builder = $db->table('submissions');
+            return $builder->where('student_id', $studentId)
+                          ->countAllResults();
+        } else {
+            // Submissions table doesn't exist, return 0
+            return 0;
+        }
+    }
+
+    /**
+     * Helper method to get total courses count
+     */
+    private function getTotalCourses()
+    {
+        $db = \Config\Database::connect();
+        
+        // Check if courses table exists first
+        if ($db->tableExists('courses')) {
+            $builder = $db->table('courses');
+            return $builder->countAllResults();
+        } else {
+            // Courses table doesn't exist, return 0
+            return 0;
+        }
+    }
+
+    /**
+     * Helper method to get teacher assignments count
+     */
+    private function getTeacherAssignmentsCount($teacherId)
+    {
+        $db = \Config\Database::connect();
+        
+        // Check if assignments table exists first
+        if ($db->tableExists('assignments')) {
+            $builder = $db->table('assignments');
+            return $builder->where('teacher_id', $teacherId)
+                          ->countAllResults();
+        } else {
+            // Assignments table doesn't exist, return 0
+            return 0;
+        }
+    }
+
+    /**
+     * Helper method to get teacher pending submissions list
+     */
+    private function getTeacherPendingSubmissionsList($teacherId)
+    {
+        $db = \Config\Database::connect();
+        
+        // Check if assignments and submissions tables exist first
+        if ($db->tableExists('assignments') && $db->tableExists('submissions')) {
+            $builder = $db->table('submissions');
+            $builder->join('assignments', 'assignments.id = submissions.assignment_id');
+            $builder->join('users', 'users.id = submissions.student_id');
+            return $builder->where('assignments.teacher_id', $teacherId)
+                          ->select('submissions.*, assignments.title as assignment_title, users.name as student_name')
+                          ->orderBy('submissions.created_at', 'DESC')
+                          ->limit(5)
+                          ->get()
+                          ->getResultArray();
+        } else {
+            // Tables don't exist, return empty array
+            return [];
+        }
     }
 }

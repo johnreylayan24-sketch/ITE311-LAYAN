@@ -1,6 +1,0 @@
-# Ignore writable logs and debugbar
-writable/logs/*
-writable/debugbar/*
-
-# Ignore system files
-.env

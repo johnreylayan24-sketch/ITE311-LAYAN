@@ -2,7 +2,7 @@
 
 use CodeIgniter\Router\RouteCollection;
 
-/**
+/**XA
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');

@@ -275,92 +275,358 @@
                     <p class="mb-0"><i class="fas fa-envelope me-2"></i>Email: <?= $user['email'] ?></p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <div class="d-flex justify-content-end">
-                        <div class="text-center me-4">
-                            <h3 class="stat-number">0</h3>
-                            <p class="mb-0">Courses</p>
+                    <?php if (isset($dashboard_title)): ?>
+                        <h4 class="text-white mb-3"><?= $dashboard_title ?></h4>
+                    <?php endif; ?>
+                    
+                    <?php if ($user['role'] === 'admin' && isset($admin_features['total_users'])): ?>
+                        <div class="d-flex justify-content-end">
+                            <div class="text-center me-4">
+                                <h3 class="stat-number"><?= $admin_features['total_users'] ?></h3>
+                                <p class="mb-0">Total Users</p>
+                            </div>
+                            <div class="text-center">
+                                <h3 class="stat-number">3</h3>
+                                <p class="mb-0">Roles</p>
+                            </div>
                         </div>
-                        <div class="text-center">
-                            <h3 class="stat-number">0%</h3>
-                            <p class="mb-0">Progress</p>
+                    <?php elseif ($user['role'] === 'teacher' && isset($teacher_features['my_courses'])): ?>
+                        <div class="d-flex justify-content-end">
+                            <div class="text-center me-4">
+                                <h3 class="stat-number"><?= count($teacher_features['my_courses']) ?></h3>
+                                <p class="mb-0">My Courses</p>
+                            </div>
+                            <div class="text-center">
+                                <h3 class="stat-number"><?= $teacher_features['pending_submissions'] ?></h3>
+                                <p class="mb-0">Pending</p>
+                            </div>
                         </div>
-                    </div>
+                    <?php elseif ($user['role'] === 'student' && isset($student_features['my_courses'])): ?>
+                        <div class="d-flex justify-content-end">
+                            <div class="text-center me-4">
+                                <h3 class="stat-number"><?= count($student_features['my_courses']) ?></h3>
+                                <p class="mb-0">Courses</p>
+                            </div>
+                            <div class="text-center">
+                                <h3 class="stat-number"><?= count($student_features['recent_grades']) ?></h3>
+                                <p class="mb-0">Grades</p>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="d-flex justify-content-end">
+                            <div class="text-center me-4">
+                                <h3 class="stat-number">0</h3>
+                                <p class="mb-0">Courses</p>
+                            </div>
+                            <div class="text-center">
+                                <h3 class="stat-number">0%</h3>
+                                <p class="mb-0">Progress</p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Stats -->
+        <!-- Role-based Dashboard Stats -->
         <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon mb-3">
-                        <i class="fas fa-book fa-3x"></i>
+            <?php if ($user['role'] === 'admin' && isset($admin_features)): ?>
+                <!-- Admin Stats -->
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-users fa-3x"></i>
+                        </div>
+                        <h3>Total Users</h3>
+                        <div class="stat-number"><?= $admin_features['total_users'] ?></div>
+                        <p class="mt-2">Registered Users</p>
                     </div>
-                    <h3>Courses</h3>
-                    <div class="stat-number">0</div>
-                    <p class="mt-2">Enrolled Courses</p>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon mb-3">
-                        <i class="fas fa-tasks fa-3x"></i>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-chalkboard-teacher fa-3x"></i>
+                        </div>
+                        <h3>Teachers</h3>
+                        <div class="stat-number">2</div>
+                        <p class="mt-2">Active Teachers</p>
                     </div>
-                    <h3>Lessons</h3>
-                    <div class="stat-number">0</div>
-                    <p class="mt-2">Completed Lessons</p>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon mb-3">
-                        <i class="fas fa-clipboard-check fa-3x"></i>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-user-graduate fa-3x"></i>
+                        </div>
+                        <h3>Students</h3>
+                        <div class="stat-number"><?= $admin_features['total_users'] - 3 ?></div>
+                        <p class="mt-2">Enrolled Students</p>
                     </div>
-                    <h3>Quizzes</h3>
-                    <div class="stat-number">0</div>
-                    <p class="mt-2">Quizzes Taken</p>
                 </div>
-            </div>
+            <?php elseif ($user['role'] === 'teacher' && isset($teacher_features)): ?>
+                <!-- Teacher Stats -->
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-book fa-3x"></i>
+                        </div>
+                        <h3>My Courses</h3>
+                        <div class="stat-number"><?= count($teacher_features['my_courses']) ?></div>
+                        <p class="mt-2">Courses Assigned</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-tasks fa-3x"></i>
+                        </div>
+                        <h3>Pending</h3>
+                        <div class="stat-number"><?= $teacher_features['pending_submissions'] ?></div>
+                        <p class="mt-2">Submissions to Review</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-users fa-3x"></i>
+                        </div>
+                        <h3>Total Students</h3>
+                        <div class="stat-number"><?= array_sum(array_column($teacher_features['my_courses'], 'students')) ?></div>
+                        <p class="mt-2">Students Enrolled</p>
+                    </div>
+                </div>
+            <?php elseif ($user['role'] === 'student' && isset($student_features)): ?>
+                <!-- Student Stats -->
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-book fa-3x"></i>
+                        </div>
+                        <h3>Courses</h3>
+                        <div class="stat-number"><?= count($student_features['my_courses']) ?></div>
+                        <p class="mt-2">Enrolled Courses</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-tasks fa-3x"></i>
+                        </div>
+                        <h3>Lessons</h3>
+                        <div class="stat-number">0</div>
+                        <p class="mt-2">Completed Lessons</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-clipboard-check fa-3x"></i>
+                        </div>
+                        <h3>Quizzes</h3>
+                        <div class="stat-number"><?= count($student_features['recent_grades']) ?></div>
+                        <p class="mt-2">Grades Received</p>
+                    </div>
+                </div>
+            <?php else: ?>
+                <!-- Default Stats -->
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-book fa-3x"></i>
+                        </div>
+                        <h3>Courses</h3>
+                        <div class="stat-number">0</div>
+                        <p class="mt-2">Enrolled Courses</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-tasks fa-3x"></i>
+                        </div>
+                        <h3>Lessons</h3>
+                        <div class="stat-number">0</div>
+                        <p class="mt-2">Completed Lessons</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon mb-3">
+                            <i class="fas fa-clipboard-check fa-3x"></i>
+                        </div>
+                        <h3>Quizzes</h3>
+                        <div class="stat-number">0</div>
+                        <p class="mt-2">Quizzes Taken</p>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 
-        <!-- Quick Actions -->
+        <!-- Role-based Quick Actions -->
         <div class="glass-card mb-4">
             <div class="card-body p-4">
                 <h3 class="h5 mb-4 text-white"><i class="fas fa-bolt me-2"></i>Quick Actions</h3>
                 <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <a href="#" class="btn btn-outline-custom w-100 py-3">
-                            <i class="fas fa-search me-2"></i>Browse Courses
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="#" class="btn btn-custom w-100 py-3">
-                            <i class="fas fa-play me-2"></i>Start Learning
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="#" class="btn btn-outline-custom w-100 py-3">
-                            <i class="fas fa-question-circle me-2"></i>Take Quiz
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="#" class="btn btn-outline-custom w-100 py-3">
-                            <i class="fas fa-user-edit me-2"></i>Edit Profile
-                        </a>
-                    </div>
+                    <?php if ($user['role'] === 'admin'): ?>
+                        <!-- Admin Actions -->
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-users-cog me-2"></i>Manage Users
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-custom w-100 py-3">
+                                <i class="fas fa-chart-bar me-2"></i>Analytics
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-cogs me-2"></i>Settings
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-file-alt me-2"></i>Reports
+                            </a>
+                        </div>
+                    <?php elseif ($user['role'] === 'teacher'): ?>
+                        <!-- Teacher Actions -->
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-chalkboard me-2"></i>My Courses
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-custom w-100 py-3">
+                                <i class="fas fa-clipboard-list me-2"></i>Grade Submissions
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-plus-circle me-2"></i>Create Lesson
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-chart-line me-2"></i>Student Progress
+                            </a>
+                        </div>
+                    <?php elseif ($user['role'] === 'student'): ?>
+                        <!-- Student Actions -->
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-search me-2"></i>Browse Courses
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-custom w-100 py-3">
+                                <i class="fas fa-play me-2"></i>Start Learning
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-question-circle me-2"></i>Take Quiz
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-user-edit me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <!-- Default Actions -->
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-search me-2"></i>Browse Courses
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-custom w-100 py-3">
+                                <i class="fas fa-play me-2"></i>Start Learning
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-question-circle me-2"></i>Take Quiz
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="#" class="btn btn-outline-custom w-100 py-3">
+                                <i class="fas fa-user-edit me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Role-based Recent Activity -->
         <div class="glass-card">
             <div class="card-body p-4">
                 <h3 class="h5 mb-4 text-white"><i class="fas fa-history me-2"></i>Recent Activity</h3>
-                <div class="text-center py-5">
-                    <i class="fas fa-inbox fa-4x mb-3" style="color: rgba(255, 255, 255, 0.3);"></i>
-                    <p class="text-white-50 mb-0">No recent activity to display.</p>
-                    <p class="text-white-50">Start exploring courses to see your activity here!</p>
-                </div>
+                
+                <?php if ($user['role'] === 'admin' && isset($admin_features['recent_activities'])): ?>
+                    <!-- Admin Activity -->
+                    <div class="activity-list">
+                        <?php foreach ($admin_features['recent_activities'] as $activity): ?>
+                            <div class="activity-item d-flex align-items-center mb-3 p-3 rounded" style="background: rgba(255, 255, 255, 0.05);">
+                                <i class="fas fa-info-circle me-3 text-info"></i>
+                                <div>
+                                    <div class="text-white"><?= $activity['action'] ?></div>
+                                    <small class="text-white-50"><?= $activity['time'] ?></small>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php elseif ($user['role'] === 'teacher' && isset($teacher_features['my_courses'])): ?>
+                    <!-- Teacher Activity -->
+                    <div class="activity-list">
+                        <?php foreach ($teacher_features['my_courses'] as $course): ?>
+                            <div class="activity-item d-flex align-items-center mb-3 p-3 rounded" style="background: rgba(255, 255, 255, 0.05);">
+                                <i class="fas fa-chalkboard-teacher me-3 text-warning"></i>
+                                <div>
+                                    <div class="text-white">Managing: <?= $course['name'] ?></div>
+                                    <small class="text-white-50"><?= $course['students'] ?> students enrolled</small>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                        <div class="activity-item d-flex align-items-center mb-3 p-3 rounded" style="background: rgba(255, 255, 255, 0.05);">
+                            <i class="fas fa-clipboard-list me-3 text-danger"></i>
+                            <div>
+                                <div class="text-white"><?= $teacher_features['pending_submissions'] ?> submissions pending review</div>
+                                <small class="text-white-50">Requires attention</small>
+                            </div>
+                        </div>
+                    </div>
+                <?php elseif ($user['role'] === 'student' && isset($student_features['my_courses'])): ?>
+                    <!-- Student Activity -->
+                    <div class="activity-list">
+                        <?php foreach ($student_features['my_courses'] as $course): ?>
+                            <div class="activity-item d-flex align-items-center mb-3 p-3 rounded" style="background: rgba(255, 255, 255, 0.05);">
+                                <i class="fas fa-book me-3 text-success"></i>
+                                <div>
+                                    <div class="text-white">Enrolled in: <?= $course['name'] ?></div>
+                                    <small class="text-white-50">Progress: <?= $course['progress'] ?>%</small>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                        <?php foreach ($student_features['recent_grades'] as $grade): ?>
+                            <div class="activity-item d-flex align-items-center mb-3 p-3 rounded" style="background: rgba(255, 255, 255, 0.05);">
+                                <i class="fas fa-star me-3 text-warning"></i>
+                                <div>
+                                    <div class="text-white">Grade received: <?= $grade['assignment'] ?></div>
+                                    <small class="text-white-50">Score: <?= $grade['grade'] ?>%</small>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <!-- Default Activity -->
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-4x mb-3" style="color: rgba(255, 255, 255, 0.3);"></i>
+                        <p class="text-white-50 mb-0">No recent activity to display.</p>
+                        <p class="text-white-50">Start exploring courses to see your activity here!</p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

@@ -140,67 +140,122 @@ class Auth extends BaseController
 
     public function dashboard()
     {
-        // Check if user is logged in
+        // Enhanced authorization check
         if (!session()->get('isLoggedIn')) {
             session()->setFlashdata('error', 'Please log in to access the dashboard.');
             return redirect()->to('/login');
         }
 
-        // Get user role from session
+        // Get user data from session
+        $userId = session()->get('userID');
         $userRole = session()->get('role');
+        $userName = session()->get('name');
+        $userEmail = session()->get('email');
+
+        // Validate session data integrity
+        if (empty($userId) || empty($userRole) || empty($userName) || empty($userEmail)) {
+            session()->destroy();
+            session()->setFlashdata('error', 'Session corrupted. Please log in again.');
+            return redirect()->to('/login');
+        }
+
+        // Verify user still exists in database
+        $db = \Config\Database::connect();
+        $user = $db->table('users')->where('id', $userId)->get()->getRowArray();
         
-        // Prepare base user data
+        if (!$user) {
+            session()->destroy();
+            session()->setFlashdata('error', 'User account not found. Please log in again.');
+            return redirect()->to('/login');
+        }
+
+        // Verify role matches database
+        if ($user['role'] !== $userRole) {
+            // Update session with correct role from database
+            session()->set('role', $user['role']);
+            $userRole = $user['role'];
+        }
+
+        // Prepare comprehensive user data
         $data = [
             'user' => [
-                'name' => session()->get('name'),
-                'email' => session()->get('email'),
-                'role' => $userRole
+                'id' => $userId,
+                'name' => $userName,
+                'email' => $userEmail,
+                'role' => $userRole,
+                'created_at' => $user['created_at'],
+                'last_login' => date('Y-m-d H:i:s')
+            ],
+            'system_info' => [
+                'total_users' => $this->getTotalUsers(),
+                'system_time' => date('Y-m-d H:i:s'),
+                'server_info' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown'
             ]
         ];
 
-        // Implement role-based conditional checks
+        // Implement enhanced role-based conditional checks with real data
         switch ($userRole) {
             case 'admin':
-                // Admin-specific data and functionality
+                // Enhanced admin-specific data with real database queries
                 $data['admin_features'] = [
                     'user_management' => true,
                     'system_settings' => true,
                     'analytics' => true,
                     'total_users' => $this->getTotalUsers(),
-                    'recent_activities' => $this->getRecentActivities()
+                    'total_admins' => $this->getUsersByRole('admin'),
+                    'total_teachers' => $this->getUsersByRole('teacher'),
+                    'total_students' => $this->getUsersByRole('student'),
+                    'recent_users' => $this->getRecentUsers(),
+                    'recent_activities' => $this->getRecentActivities(),
+                    'system_stats' => $this->getSystemStats()
                 ];
                 $data['dashboard_title'] = 'Admin Dashboard';
+                $data['analytics_data'] = $this->getAnalyticsData();
                 break;
                 
             case 'teacher':
-                // Teacher-specific data and functionality
+                // Enhanced teacher-specific data with real database queries
                 $data['teacher_features'] = [
                     'course_management' => true,
                     'grade_management' => true,
                     'student_monitoring' => true,
-                    'my_courses' => $this->getTeacherCourses(),
-                    'pending_submissions' => $this->getPendingSubmissions()
+                    'my_courses' => $this->getTeacherCourses($userId),
+                    'pending_submissions' => $this->getPendingSubmissions($userId),
+                    'total_students' => $this->getTeacherStudentsCount($userId),
+                    'recent_grades' => $this->getTeacherRecentGrades($userId)
                 ];
                 $data['dashboard_title'] = 'Teacher Dashboard';
+                $data['teacher_stats'] = $this->getTeacherStats($userId);
                 break;
                 
             case 'student':
-                // Student-specific data and functionality
+                // Enhanced student-specific data with real database queries
                 $data['student_features'] = [
                     'course_enrollment' => true,
                     'assignment_submission' => true,
                     'grade_viewing' => true,
-                    'my_courses' => $this->getStudentCourses(),
-                    'recent_grades' => $this->getStudentGrades()
+                    'my_courses' => $this->getStudentCourses($userId),
+                    'recent_grades' => $this->getStudentGrades($userId),
+                    'pending_assignments' => $this->getStudentPendingAssignments($userId),
+                    'overall_gpa' => $this->getStudentGPA($userId)
                 ];
                 $data['dashboard_title'] = 'Student Dashboard';
+                $data['student_stats'] = $this->getStudentStats($userId);
                 break;
                 
             default:
-                // Handle unknown roles
-                session()->setFlashdata('error', 'Invalid user role detected.');
+                // Enhanced handling for unknown roles
+                log_message('error', 'Unknown role detected: ' . $userRole . ' for user ID: ' . $userId);
+                session()->setFlashdata('error', 'Invalid user role detected. Please contact administrator.');
                 return redirect()->to('/login');
         }
+
+        // Add common dashboard data
+        $data['notifications'] = $this->getUserNotifications($userId);
+        $data['quick_actions'] = $this->getQuickActions($userRole);
+        
+        // Log dashboard access
+        $this->logDashboardAccess($userId, $userRole);
 
         return view('dashboard', $data);
     }
@@ -228,48 +283,480 @@ class Auth extends BaseController
         ];
     }
 
-    /**
-     * Helper method to get teacher courses (Teacher)
-     */
-    private function getTeacherCourses()
-    {
-        // This would typically query courses where teacher is assigned
-        return [
-            ['name' => 'Web Development', 'students' => 25],
-            ['name' => 'Database Design', 'students' => 18]
-        ];
-    }
-
-    /**
-     * Helper method to get pending submissions (Teacher)
-     */
-    private function getPendingSubmissions()
-    {
-        // This would typically query pending assignments/submissions
-        return 12; // Example count
-    }
-
-    /**
-     * Helper method to get student courses (Student)
-     */
-    private function getStudentCourses()
-    {
-        // This would typically query courses where student is enrolled
-        return [
-            ['name' => 'Web Development', 'progress' => 75],
-            ['name' => 'Database Design', 'progress' => 60]
-        ];
-    }
 
     /**
      * Helper method to get student grades (Student)
      */
-    private function getStudentGrades()
+    private function getStudentGrades($userId = null)
     {
-        // This would typically query student grades
+        $db = \Config\Database::connect();
+        
+        if ($userId) {
+            // Real database query for specific student
+            $builder = $db->table('grades');
+            $grades = $builder->where('student_id', $userId)
+                              ->orderBy('created_at', 'DESC')
+                              ->limit(10)
+                              ->get()
+                              ->getResultArray();
+            
+            return $grades ?: [
+                ['assignment' => 'No grades available', 'grade' => 'N/A', 'created_at' => date('Y-m-d H:i:s')]
+            ];
+        } else {
+            // Fallback for backward compatibility
+            return [
+                ['assignment' => 'Midterm Exam', 'grade' => 85],
+                ['assignment' => 'Project Proposal', 'grade' => 92]
+            ];
+        }
+    }
+
+    /**
+     * Helper method to get users by role (Admin)
+     */
+    private function getUsersByRole($role)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('users');
+        return $builder->where('role', $role)->countAllResults();
+    }
+
+    /**
+     * Helper method to get recent users (Admin)
+     */
+    private function getRecentUsers()
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('users');
+        return $builder->select('id, name, email, role, created_at')
+                      ->orderBy('created_at', 'DESC')
+                      ->limit(5)
+                      ->get()
+                      ->getResultArray();
+    }
+
+    /**
+     * Helper method to get system stats (Admin)
+     */
+    private function getSystemStats()
+    {
+        $db = \Config\Database::connect();
+        
         return [
-            ['assignment' => 'Midterm Exam', 'grade' => 85],
-            ['assignment' => 'Project Proposal', 'grade' => 92]
+            'database_size' => $this->getDatabaseSize(),
+            'server_load' => $this->getServerLoad(),
+            'memory_usage' => $this->getMemoryUsage(),
+            'disk_usage' => $this->getDiskUsage()
         ];
+    }
+
+    /**
+     * Helper method to get analytics data (Admin)
+     */
+    private function getAnalyticsData()
+    {
+        $db = \Config\Database::connect();
+        
+        // Get user registration trends
+        $builder = $db->table('users');
+        $last7Days = date('Y-m-d', strtotime('-7 days'));
+        $newUsers = $builder->where('created_at >=', $last7Days)->countAllResults();
+        
+        return [
+            'new_users_last_7_days' => $newUsers,
+            'user_growth_rate' => $this->calculateUserGrowthRate(),
+            'role_distribution' => [
+                'admin' => $this->getUsersByRole('admin'),
+                'teacher' => $this->getUsersByRole('teacher'),
+                'student' => $this->getUsersByRole('student')
+            ],
+            'system_uptime' => $this->getSystemUptime()
+        ];
+    }
+
+    /**
+     * Helper method to get teacher courses with user ID
+     */
+    private function getTeacherCourses($teacherId = null)
+    {
+        $db = \Config\Database::connect();
+        
+        if ($teacherId) {
+            // Real database query for specific teacher
+            $builder = $db->table('courses');
+            $courses = $builder->where('teacher_id', $teacherId)
+                              ->where('status', 'active')
+                              ->get()
+                              ->getResultArray();
+            
+            return $courses ?: [
+                ['name' => 'No courses assigned', 'students' => 0, 'status' => 'inactive']
+            ];
+        } else {
+            // Fallback for backward compatibility
+            return [
+                ['name' => 'Web Development', 'students' => 25],
+                ['name' => 'Database Design', 'students' => 18]
+            ];
+        }
+    }
+
+    /**
+     * Helper method to get pending submissions with user ID
+     */
+    private function getPendingSubmissions($teacherId = null)
+    {
+        $db = \Config\Database::connect();
+        
+        if ($teacherId) {
+            // Real database query for specific teacher
+            $builder = $db->table('submissions');
+            $builder->join('assignments', 'assignments.id = submissions.assignment_id');
+            $pendingCount = $builder->where('assignments.teacher_id', $teacherId)
+                                   ->where('submissions.status', 'pending')
+                                   ->countAllResults();
+            
+            return $pendingCount;
+        } else {
+            // Fallback for backward compatibility
+            return 12;
+        }
+    }
+
+    /**
+     * Helper method to get teacher students count
+     */
+    private function getTeacherStudentsCount($teacherId)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('enrollments');
+        $builder->join('courses', 'courses.id = enrollments.course_id');
+        return $builder->where('courses.teacher_id', $teacherId)
+                      ->where('enrollments.status', 'active')
+                      ->countAllResults();
+    }
+
+    /**
+     * Helper method to get teacher recent grades
+     */
+    private function getTeacherRecentGrades($teacherId)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('grades');
+        $builder->join('students', 'students.id = grades.student_id');
+        return $builder->where('grades.teacher_id', $teacherId)
+                      ->orderBy('grades.created_at', 'DESC')
+                      ->limit(5)
+                      ->get()
+                      ->getResultArray();
+    }
+
+    /**
+     * Helper method to get teacher stats
+     */
+    private function getTeacherStats($teacherId)
+    {
+        $db = \Config\Database::connect();
+        
+        return [
+            'total_courses' => count($this->getTeacherCourses($teacherId)),
+            'total_students' => $this->getTeacherStudentsCount($teacherId),
+            'pending_submissions' => $this->getPendingSubmissions($teacherId),
+            'average_grade' => $this->getTeacherAverageGrade($teacherId)
+        ];
+    }
+
+    /**
+     * Helper method to get student courses with user ID
+     */
+    private function getStudentCourses($studentId = null)
+    {
+        $db = \Config\Database::connect();
+        
+        if ($studentId) {
+            // Real database query for specific student
+            $builder = $db->table('enrollments');
+            $builder->join('courses', 'courses.id = enrollments.course_id');
+            $courses = $builder->where('enrollments.student_id', $studentId)
+                              ->where('enrollments.status', 'active')
+                              ->get()
+                              ->getResultArray();
+            
+            return $courses ?: [
+                ['name' => 'No courses enrolled', 'progress' => 0, 'status' => 'inactive']
+            ];
+        } else {
+            // Fallback for backward compatibility
+            return [
+                ['name' => 'Web Development', 'progress' => 75],
+                ['name' => 'Database Design', 'progress' => 60]
+            ];
+        }
+    }
+
+    /**
+     * Helper method to get student pending assignments
+     */
+    private function getStudentPendingAssignments($studentId)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('assignments');
+        $builder->join('enrollments', 'enrollments.course_id = assignments.course_id');
+        $builder->join('submissions', 'submissions.assignment_id = assignments.id AND submissions.student_id = ' . $studentId, 'left');
+        
+        return $builder->where('enrollments.student_id', $studentId)
+                      ->where('assignments.due_date >', date('Y-m-d H:i:s'))
+                      ->where('submissions.id IS NULL')
+                      ->countAllResults();
+    }
+
+    /**
+     * Helper method to get student GPA
+     */
+    private function getStudentGPA($studentId)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('grades');
+        $grades = $builder->select('grade')
+                         ->where('student_id', $studentId)
+                         ->get()
+                         ->getResultArray();
+        
+        if (empty($grades)) {
+            return 0.0;
+        }
+        
+        $total = 0;
+        $count = 0;
+        foreach ($grades as $grade) {
+            if (is_numeric($grade['grade'])) {
+                $total += $grade['grade'];
+                $count++;
+            }
+        }
+        
+        return $count > 0 ? round($total / $count, 2) : 0.0;
+    }
+
+    /**
+     * Helper method to get student stats
+     */
+    private function getStudentStats($studentId)
+    {
+        $db = \Config\Database::connect();
+        
+        return [
+            'total_courses' => count($this->getStudentCourses($studentId)),
+            'pending_assignments' => $this->getStudentPendingAssignments($studentId),
+            'overall_gpa' => $this->getStudentGPA($studentId),
+            'completed_assignments' => $this->getStudentCompletedAssignments($studentId)
+        ];
+    }
+
+    /**
+     * Helper method to get user notifications
+     */
+    private function getUserNotifications($userId)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('notifications');
+        return $builder->where('user_id', $userId)
+                      ->where('is_read', 0)
+                      ->orderBy('created_at', 'DESC')
+                      ->limit(5)
+                      ->get()
+                      ->getResultArray();
+    }
+
+    /**
+     * Helper method to get quick actions by role
+     */
+    private function getQuickActions($role)
+    {
+        $actions = [
+            'admin' => [
+                ['icon' => 'fas fa-users', 'label' => 'Manage Users', 'url' => '/admin/users'],
+                ['icon' => 'fas fa-cog', 'label' => 'System Settings', 'url' => '/admin/settings'],
+                ['icon' => 'fas fa-chart-bar', 'label' => 'Analytics', 'url' => '/admin/analytics'],
+                ['icon' => 'fas fa-file-alt', 'label' => 'Reports', 'url' => '/admin/reports']
+            ],
+            'teacher' => [
+                ['icon' => 'fas fa-book', 'label' => 'Course Management', 'url' => '/teacher/courses'],
+                ['icon' => 'fas fa-graduation-cap', 'label' => 'Grade Management', 'url' => '/teacher/grades'],
+                ['icon' => 'fas fa-users', 'label' => 'Student Monitoring', 'url' => '/teacher/students'],
+                ['icon' => 'fas fa-tasks', 'label' => 'Assignments', 'url' => '/teacher/assignments']
+            ],
+            'student' => [
+                ['icon' => 'fas fa-book-open', 'label' => 'My Courses', 'url' => '/student/courses'],
+                ['icon' => 'fas fa-edit', 'label' => 'Assignments', 'url' => '/student/assignments'],
+                ['icon' => 'fas fa-chart-line', 'label' => 'Grades', 'url' => '/student/grades'],
+                ['icon' => 'fas fa-calendar', 'label' => 'Schedule', 'url' => '/student/schedule']
+            ]
+        ];
+        
+        return $actions[$role] ?? [];
+    }
+
+    /**
+     * Helper method to log dashboard access
+     */
+    private function logDashboardAccess($userId, $role)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('user_logs');
+        
+        $logData = [
+            'user_id' => $userId,
+            'action' => 'dashboard_access',
+            'role' => $role,
+            'ip_address' => $this->request->getIPAddress(),
+            'user_agent' => $this->request->getUserAgent(),
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+        
+        try {
+            $builder->insert($logData);
+        } catch (\Exception $e) {
+            // Log error but don't break the dashboard
+            log_message('error', 'Failed to log dashboard access: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to get database size
+     */
+    private function getDatabaseSize()
+    {
+        $db = \Config\Database::connect();
+        try {
+            $query = $db->query("SELECT table_schema AS db_name, 
+                                SUM(data_length + index_length) AS size 
+                                FROM information_schema.tables 
+                                WHERE table_schema = '{$db->database}' 
+                                GROUP BY table_schema");
+            $result = $query->getRowArray();
+            return $result ? round($result['size'] / 1024 / 1024, 2) : 0; // Size in MB
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Helper method to get server load
+     */
+    private function getServerLoad()
+    {
+        if (function_exists('sys_getloadavg')) {
+            $load = sys_getloadavg();
+            return $load[0] ?? 0;
+        }
+        return 0;
+    }
+
+    /**
+     * Helper method to get memory usage
+     */
+    private function getMemoryUsage()
+    {
+        if (function_exists('memory_get_usage')) {
+            return round(memory_get_usage(true) / 1024 / 1024, 2); // MB
+        }
+        return 0;
+    }
+
+    /**
+     * Helper method to get disk usage
+     */
+    private function getDiskUsage()
+    {
+        $freeSpace = disk_free_space('/');
+        $totalSpace = disk_total_space('/');
+        $usedSpace = $totalSpace - $freeSpace;
+        
+        return [
+            'total' => round($totalSpace / 1024 / 1024 / 1024, 2), // GB
+            'used' => round($usedSpace / 1024 / 1024 / 1024, 2),   // GB
+            'free' => round($freeSpace / 1024 / 1024 / 1024, 2),   // GB
+            'percentage' => round(($usedSpace / $totalSpace) * 100, 1)
+        ];
+    }
+
+    /**
+     * Helper method to calculate user growth rate
+     */
+    private function calculateUserGrowthRate()
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('users');
+        
+        $last30Days = date('Y-m-d', strtotime('-30 days'));
+        $last60Days = date('Y-m-d', strtotime('-60 days'));
+        
+        $recentUsers = $builder->where('created_at >=', $last30Days)->countAllResults();
+        $previousUsers = $builder->where('created_at >=', $last60Days)
+                                ->where('created_at <', $last30Days)->countAllResults();
+        
+        if ($previousUsers == 0) {
+            return $recentUsers > 0 ? 100 : 0;
+        }
+        
+        return round((($recentUsers - $previousUsers) / $previousUsers) * 100, 1);
+    }
+
+    /**
+     * Helper method to get system uptime
+     */
+    private function getSystemUptime()
+    {
+        if (function_exists('exec')) {
+            try {
+                $uptime = exec('uptime');
+                return $uptime ?: 'Unknown';
+            } catch (\Exception $e) {
+                return 'Unknown';
+            }
+        }
+        return 'Unknown';
+    }
+
+    /**
+     * Helper method to get teacher average grade
+     */
+    private function getTeacherAverageGrade($teacherId)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('grades');
+        $grades = $builder->select('grade')
+                         ->where('teacher_id', $teacherId)
+                         ->get()
+                         ->getResultArray();
+        
+        if (empty($grades)) {
+            return 0.0;
+        }
+        
+        $total = 0;
+        $count = 0;
+        foreach ($grades as $grade) {
+            if (is_numeric($grade['grade'])) {
+                $total += $grade['grade'];
+                $count++;
+            }
+        }
+        
+        return $count > 0 ? round($total / $count, 2) : 0.0;
+    }
+
+    /**
+     * Helper method to get student completed assignments
+     */
+    private function getStudentCompletedAssignments($studentId)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('submissions');
+        return $builder->where('student_id', $studentId)
+                      ->where('status', 'completed')
+                      ->countAllResults();
     }
 }

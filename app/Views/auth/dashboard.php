@@ -383,7 +383,7 @@
                                                     <i class="fas fa-user-plus fa-2x text-primary"></i>
                                                 </div>
                                                 <div class="activity-content flex-grow-1">
-                                                    <p class="mb-1 text-white">New user registered: <strong><?= esc($recent_user['username']) ?></strong> (<?= esc($recent_user['role']) ?>)</p>
+                                                    <p class="mb-1 text-white">New user registered: <strong><?= esc($recent_user['name']) ?></strong> (<?= esc($recent_user['role']) ?>)</p>
                                                     <small class="text-white-50"><?= date('M j, Y g:i A', strtotime($recent_user['created_at'])) ?></small>
                                                 </div>
                                             </div>

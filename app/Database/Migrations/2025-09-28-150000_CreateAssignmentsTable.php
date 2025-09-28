@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateCoursesTable extends Migration
+class CreateAssignmentsTable extends Migration
 {
     public function up()
     {
@@ -15,6 +15,11 @@ class CreateCoursesTable extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
+            'course_id' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+            ],
             'teacher_id' => [
                 'type'       => 'INT',
                 'constraint' => 11,
@@ -22,11 +27,20 @@ class CreateCoursesTable extends Migration
             ],
             'title' => [
                 'type'       => 'VARCHAR',
-                'constraint' => 100,
+                'constraint' => 200,
             ],
             'description' => [
                 'type' => 'TEXT',
                 'null' => true,
+            ],
+            'due_date' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'total_points' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'default'    => 100,
             ],
             'created_at' => [
                 'type' => 'DATETIME',
@@ -38,11 +52,13 @@ class CreateCoursesTable extends Migration
             ],
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->createTable('courses');
+        $this->forge->addForeignKey('course_id', 'courses', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('teacher_id', 'users', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->createTable('assignments');
     }
 
     public function down()
     {
-        $this->forge->dropTable('courses');
+        $this->forge->dropTable('assignments');
     }
 }

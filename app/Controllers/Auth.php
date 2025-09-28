@@ -1030,4 +1030,14 @@ class Auth extends BaseController
             return [];
         }
     }
+
+    /**
+     * Helper method to get users by role (Admin)
+     */
+    private function getUsersByRole($role)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('users');
+        return $builder->where('role', $role)->countAllResults();
+    }
 }

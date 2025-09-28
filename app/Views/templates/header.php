@@ -308,10 +308,10 @@ $userRole = $user['role'] ?? 'guest';
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                                 <div class="user-avatar me-2">
-                                    <?= strtoupper(substr($user['username'] ?? 'U', 0, 1)) ?>
+                                    <?= strtoupper(substr($user['name'] ?? 'U', 0, 1)) ?>
                                 </div>
                                 <div class="d-none d-md-block">
-                                    <div class="small"><?= esc($user['username'] ?? 'User') ?></div>
+                                    <div class="small"><?= esc($user['name'] ?? 'User') ?></div>
                                     <span class="badge-role badge-<?= $userRole ?>"><?= $userRole ?></span>
                                 </div>
                             </a>

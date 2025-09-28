@@ -12,29 +12,56 @@ class Auth extends BaseController
         $db = \Config\Database::connect();
         
         if ($this->request->getMethod() === 'POST') {
-            // Set validation rules
+            // CSRF Protection - Check if it's a valid POST request
+            if (!$this->request->isAJAX() && empty($this->request->getPost())) {
+                session()->setFlashdata('error', 'Invalid request method.');
+                return redirect()->to('/register');
+            }
+            
+            // Rate limiting for registration
+            $registrationAttempts = session()->get('registration_attempts') ?? 0;
+            $lastRegistrationAttempt = session()->get('last_registration_attempt') ?? 0;
+            
+            // Limit registration attempts (3 per hour)
+            if ($registrationAttempts >= 3 && (time() - $lastRegistrationAttempt) < 3600) {
+                session()->setFlashdata('error', 'Too many registration attempts. Please try again later.');
+                return redirect()->to('/register');
+            }
+            
+            // Reset attempts if 1 hour has passed
+            if ((time() - $lastRegistrationAttempt) >= 3600) {
+                session()->remove('registration_attempts');
+                session()->remove('last_registration_attempt');
+                $registrationAttempts = 0;
+            }
+            
+            // Set enhanced validation rules
             $validationRules = [
                 'name' => [
-                    'rules' => 'required|min_length[3]|max_length[100]',
+                    'rules' => 'required|min_length[3]|max_length[100]|alpha_numeric_spaces',
                     'errors' => [
                         'required' => 'Name is required.',
                         'min_length' => 'Name must be at least 3 characters long.',
-                        'max_length' => 'Name cannot exceed 100 characters.'
+                        'max_length' => 'Name cannot exceed 100 characters.',
+                        'alpha_numeric_spaces' => 'Name can only contain letters, numbers, and spaces.'
                     ]
                 ],
                 'email' => [
-                    'rules' => 'required|valid_email|is_unique[users.email]',
+                    'rules' => 'required|valid_email|max_length[100]|is_unique[users.email]',
                     'errors' => [
                         'required' => 'Email is required.',
                         'valid_email' => 'Please enter a valid email address.',
+                        'max_length' => 'Email address is too long.',
                         'is_unique' => 'This email is already registered.'
                     ]
                 ],
                 'password' => [
-                    'rules' => 'required|min_length[6]',
+                    'rules' => 'required|min_length[8]|max_length[255]|regex_match[/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/]',
                     'errors' => [
                         'required' => 'Password is required.',
-                        'min_length' => 'Password must be at least 6 characters long.'
+                        'min_length' => 'Password must be at least 8 characters long.',
+                        'max_length' => 'Password is too long.',
+                        'regex_match' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
                     ]
                 ],
                 'password_confirm' => [
@@ -47,28 +74,69 @@ class Auth extends BaseController
             ];
 
             if ($this->validate($validationRules)) {
-                // Hash the password
-                $hashedPassword = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
+                // Sanitize input
+                $name = htmlspecialchars(trim($this->request->getPost('name')));
+                $email = filter_var($this->request->getPost('email'), FILTER_SANITIZE_EMAIL);
+                $password = $this->request->getPost('password');
+                
+                // Additional email validation
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    session()->setFlashdata('error', 'Invalid email format.');
+                    return redirect()->to('/register');
+                }
+                
+                // Hash the password with strong options
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]);
+                
+                if ($hashedPassword === false) {
+                    session()->setFlashdata('error', 'Password hashing failed. Please try again.');
+                    return redirect()->to('/register');
+                }
 
-                // Prepare user data
+                // Prepare secure user data
                 $userData = [
-                    'name' => $this->request->getPost('name'),
-                    'email' => $this->request->getPost('email'),
+                    'name' => $name,
+                    'email' => $email,
                     'password' => $hashedPassword,
                     'role' => 'student', // Default role
+                    'status' => 'active', // Add status field
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
 
-                // Insert user into database
-                $builder = $db->table('users');
-                if ($builder->insert($userData)) {
-                    session()->setFlashdata('success', 'Registration successful! Please log in.');
-                    return redirect()->to('/login');
-                } else {
-                    session()->setFlashdata('error', 'Registration failed. Please try again.');
+                // Insert user into database with error handling
+                try {
+                    $builder = $db->table('users');
+                    if ($builder->insert($userData)) {
+                        // Log successful registration
+                        log_message('info', "New user registered: {$email} from {$this->request->getIPAddress()}");
+                        
+                        // Clear registration attempts
+                        session()->remove('registration_attempts');
+                        session()->remove('last_registration_attempt');
+                        
+                        session()->setFlashdata('success', 'Registration successful! Please log in.');
+                        return redirect()->to('/login');
+                    } else {
+                        // Increment registration attempts
+                        $newAttempts = $registrationAttempts + 1;
+                        session()->set('registration_attempts', $newAttempts);
+                        session()->set('last_registration_attempt', time());
+                        
+                        session()->setFlashdata('error', 'Registration failed. Please try again.');
+                        log_message('error', "Registration failed for email: {$email}");
+                    }
+                } catch (\Exception $e) {
+                    // Log database error
+                    log_message('error', "Database error during registration: " . $e->getMessage());
+                    session()->setFlashdata('error', 'A system error occurred. Please try again later.');
                 }
             } else {
+                // Increment registration attempts on validation failure
+                $newAttempts = $registrationAttempts + 1;
+                session()->set('registration_attempts', $newAttempts);
+                session()->set('last_registration_attempt', time());
+                
                 session()->setFlashdata('errors', $this->validator->getErrors());
             }
         }
@@ -81,46 +149,107 @@ class Auth extends BaseController
         $db = \Config\Database::connect();
         
         if ($this->request->getMethod() === 'POST') {
-            // Set validation rules
+            // CSRF Protection - Check if it's a valid POST request
+            if (!$this->request->isAJAX() && empty($this->request->getPost())) {
+                session()->setFlashdata('error', 'Invalid request method.');
+                return redirect()->to('/login');
+            }
+            
+            // Rate limiting - Check for too many failed attempts
+            $failedAttempts = session()->get('failed_login_attempts') ?? 0;
+            $lastAttemptTime = session()->get('last_login_attempt') ?? 0;
+            
+            // Lock account for 5 minutes after 5 failed attempts
+            if ($failedAttempts >= 5 && (time() - $lastAttemptTime) < 300) {
+                session()->setFlashdata('error', 'Too many failed attempts. Please try again after 5 minutes.');
+                return redirect()->to('/login');
+            }
+            
+            // Reset attempts if 5 minutes have passed
+            if ((time() - $lastAttemptTime) >= 300) {
+                session()->remove('failed_login_attempts');
+                session()->remove('last_login_attempt');
+                $failedAttempts = 0;
+            }
+            
+            // Set enhanced validation rules
             $validationRules = [
                 'email' => [
-                    'rules' => 'required|valid_email',
+                    'rules' => 'required|valid_email|max_length[100]',
                     'errors' => [
                         'required' => 'Email is required.',
-                        'valid_email' => 'Please enter a valid email address.'
+                        'valid_email' => 'Please enter a valid email address.',
+                        'max_length' => 'Email address is too long.'
                     ]
                 ],
                 'password' => [
-                    'rules' => 'required',
+                    'rules' => 'required|min_length[6]|max_length[255]',
                     'errors' => [
-                        'required' => 'Password is required.'
+                        'required' => 'Password is required.',
+                        'min_length' => 'Password must be at least 6 characters long.',
+                        'max_length' => 'Password is too long.'
                     ]
                 ]
             ];
 
             if ($this->validate($validationRules)) {
-                $email = $this->request->getPost('email');
+                // Sanitize input
+                $email = filter_var($this->request->getPost('email'), FILTER_SANITIZE_EMAIL);
                 $password = $this->request->getPost('password');
 
-                // Check if user exists
+                // Check if user exists with prepared statement
                 $builder = $db->table('users');
                 $user = $builder->where('email', $email)->get()->getRowArray();
 
                 if ($user && password_verify($password, $user['password'])) {
-                    // Create user session
+                    // Verify user account is active (add status field if needed)
+                    if (isset($user['status']) && $user['status'] === 'inactive') {
+                        session()->setFlashdata('error', 'Your account is inactive. Please contact administrator.');
+                        return redirect()->to('/login');
+                    }
+                    
+                    // Reset failed attempts on successful login
+                    session()->remove('failed_login_attempts');
+                    session()->remove('last_login_attempt');
+                    
+                    // Regenerate session ID to prevent session fixation
+                    session()->regenerate();
+                    
+                    // Create secure user session
                     $sessionData = [
                         'userID' => $user['id'],
                         'name' => $user['name'],
                         'email' => $user['email'],
                         'role' => $user['role'],
-                        'isLoggedIn' => true
+                        'isLoggedIn' => true,
+                        'lastActivity' => time(),
+                        'ipAddress' => $this->request->getIPAddress(),
+                        'userAgent' => $this->request->getUserAgent()
                     ];
                     
                     session()->set($sessionData);
-                    session()->setFlashdata('success', 'Welcome, ' . $user['name'] . '!');
+                    
+                    // Log successful login
+                    log_message('info', "User {$user['email']} logged in successfully from {$this->request->getIPAddress()}");
+                    
+                    session()->setFlashdata('success', 'Welcome, ' . htmlspecialchars($user['name']) . '!');
                     return redirect()->to('/dashboard');
                 } else {
-                    session()->setFlashdata('error', 'Invalid email or password.');
+                    // Increment failed attempts
+                    $newAttempts = $failedAttempts + 1;
+                    session()->set('failed_login_attempts', $newAttempts);
+                    session()->set('last_login_attempt', time());
+                    
+                    // Log failed login attempt
+                    log_message('warning', "Failed login attempt for email: {$email} from {$this->request->getIPAddress()}");
+                    
+                    // Generic error message to prevent user enumeration
+                    $remainingAttempts = max(0, 5 - $newAttempts);
+                    if ($remainingAttempts > 0) {
+                        session()->setFlashdata('error', 'Invalid email or password. ' . $remainingAttempts . ' attempts remaining.');
+                    } else {
+                        session()->setFlashdata('error', 'Too many failed attempts. Account temporarily locked.');
+                    }
                 }
             } else {
                 session()->setFlashdata('errors', $this->validator->getErrors());

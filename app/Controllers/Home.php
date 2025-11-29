@@ -6,16 +6,16 @@ class Home extends BaseController
 {
     public function index()
     {
-        return view('template');   // Loads template.php inside app/Views/
+        return view('index');
     }
 
     public function about()
     {
-        return view('about');   // Loads about.php inside app/Views/
+        return view('about');
     }
 
     public function contact()
     {
-        return view('contact'); // Loads contact.php inside app/Views/
+        return view('contact');
     }
 }

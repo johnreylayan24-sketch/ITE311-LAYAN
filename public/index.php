@@ -1,4 +1,8 @@
 <?php
+// Start output buffering to prevent any unwanted output
+if (ob_get_level() === 0) {
+    ob_start();
+}
 
 use CodeIgniter\Boot;
 use Config\Paths;
@@ -55,5 +59,10 @@ $paths = new Paths();
 
 // LOAD THE FRAMEWORK BOOTSTRAP FILE
 require $paths->systemDirectory . '/Boot.php';
+
+// Clean any output before sending the final response
+if (ob_get_length() > 0) {
+    ob_clean();
+}
 
 exit(Boot::bootWeb($paths));

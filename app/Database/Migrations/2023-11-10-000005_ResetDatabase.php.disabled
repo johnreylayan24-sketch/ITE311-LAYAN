@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Database\Migrations;
+
+use CodeIgniter\Database\Migration;
+
+class ResetDatabase extends Migration
+{
+    public function up()
+    {
+        // Drop tables in reverse order of creation to avoid foreign key constraints
+        $this->forge->dropTable('submissions', true);
+        $this->forge->dropTable('assignments', true);
+        $this->forge->dropTable('enrollments', true);
+        $this->forge->dropTable('courses', true);
+        $this->forge->dropTable('users', true);
+    }
+
+    public function down()
+    {
+        // This is a destructive migration, so we don't implement down()
+        // as we don't want to accidentally recreate the tables with data
+    }
+}

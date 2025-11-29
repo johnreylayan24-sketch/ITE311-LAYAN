@@ -6,11 +6,8 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    protected $table = 'users';
+    protected $table = 'users'; // Your DB table name
     protected $primaryKey = 'id';
-    protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-
-    protected $allowedFields = ['name', 'email', 'password', 'role'];
+    protected $allowedFields = ['name', 'email', 'password', 'role']; // Fields you want to insert/update
+    protected $useTimestamps = true; // optional
 }

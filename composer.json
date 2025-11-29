@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-    "name": "codeigniter4/framework",
-=======
     "name": "codeigniter4/codeigniter4",
->>>>>>> f69d1ecc667fa858b3ff951ed491fe09fae783e2
     "description": "The CodeIgniter framework v4",
     "license": "MIT",
     "type": "project",
@@ -21,16 +17,6 @@
         "psr/log": "^3.0"
     },
     "require-dev": {
-<<<<<<< HEAD
-        "codeigniter/coding-standard": "^1.7",
-        "fakerphp/faker": "^1.24",
-        "friendsofphp/php-cs-fixer": "^3.47.1",
-        "kint-php/kint": "^6.0",
-        "mikey179/vfsstream": "^1.6.12",
-        "nexusphp/cs-config": "^3.6",
-        "phpunit/phpunit": "^10.5.16 || ^11.2",
-        "predis/predis": "^3.0"
-=======
         "codeigniter/phpstan-codeigniter": "1.x-dev",
         "fakerphp/faker": "^1.24",
         "kint-php/kint": "^6.0",
@@ -47,7 +33,6 @@
     },
     "replace": {
         "codeigniter4/framework": "self.version"
->>>>>>> f69d1ecc667fa858b3ff951ed491fe09fae783e2
     },
     "suggest": {
         "ext-curl": "If you use CURLRequest class",
@@ -75,12 +60,6 @@
             "CodeIgniter\\": "system/"
         },
         "exclude-from-classmap": [
-<<<<<<< HEAD
-            "**/Database/Migrations/**"
-        ]
-    },
-    "config": {
-=======
             "**/Database/Migrations/**",
             "system/ThirdParty/**",
             "tests/system/Config/fixtures/**"
@@ -96,18 +75,13 @@
         "allow-plugins": {
             "phpstan/extension-installer": true
         },
->>>>>>> f69d1ecc667fa858b3ff951ed491fe09fae783e2
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
     },
-<<<<<<< HEAD
-    "scripts": {
-        "test": "phpunit"
-=======
     "extra": {
         "branch-alias": {
-            "dev-*": "4.6.x-dev"
+            "dev-develop": "4.6.x-dev"
         }
     },
     "scripts": {
@@ -156,6 +130,5 @@
         "phpstan:baseline": "Run PHPStan then dump all errors to baseline",
         "phpstan:check": "Run PHPStan with support for identifiers",
         "test": "Run unit tests"
->>>>>>> f69d1ecc667fa858b3ff951ed491fe09fae783e2
     }
 }

@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 # Disable directory browsing and MultiViews
 Options -Indexes -MultiViews
+=======
+# Disable directory browsing
+Options All -Indexes
+>>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
 
 # Enable the rewrite engine
 <IfModule mod_rewrite.c>
+<<<<<<< HEAD
     RewriteEngine On
     
     # Set the base path (adjust if your app is in a subdirectory)
@@ -31,6 +37,40 @@ Options -Indexes -MultiViews
 </IfModule>
 
 <IfModule !mod_rewrite.c>
+=======
+    Options +FollowSymLinks
+    RewriteEngine On
+
+    # If you installed CodeIgniter in a subfolder, you will need to
+    # change the following line to match the subfolder you need.
+    # http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
+    # RewriteBase /
+
+    # Redirect Trailing Slashes...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+    # Rewrite "www.example.com -> example.com"
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
+
+    # Checks to see if the user is attempting to access a valid file,
+    # such as an image or css document, if this isn't true it sends the
+    # request to the front controller, index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php/$1 [L]
+
+    # Ensure Authorization header is passed along
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    # If we don't have mod_rewrite installed, all 404's
+    # can be sent to index.php, and everything works as normal.
+>>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
     ErrorDocument 404 index.php
 </IfModule>
 
@@ -44,6 +84,7 @@ Options -Indexes -MultiViews
 
 # Disable server signature
 ServerSignature Off
+<<<<<<< HEAD
 
 # Set default charset
 AddDefaultCharset UTF-8
@@ -52,3 +93,5 @@ AddDefaultCharset UTF-8
 <IfModule mod_autoindex.c>
     Options -Indexes
 </IfModule>
+=======
+>>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf

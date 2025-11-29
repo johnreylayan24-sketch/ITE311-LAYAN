@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Disable directory browsing
 Options -Indexes
 
@@ -21,3 +22,23 @@ Options -Indexes
     # RewriteCond %{HTTPS} off
     # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </IfModule>
+=======
+RewriteEngine On
+
+# Block URLs with double slashes anywhere - FIRST RULE
+RewriteCond %{REQUEST_URI} //
+RewriteRule ^ - [F,L]
+
+RewriteBase /ITE311-LAYAN/
+
+# Block direct access to public URLs - return 403 Forbidden
+RewriteCond %{REQUEST_URI} ^/ITE311-LAYAN/public/ [NC]
+RewriteRule ^ - [F,L]
+
+# Route all non-public requests to public directory
+RewriteCond %{REQUEST_URI} !^/ITE311-LAYAN/public/
+RewriteRule ^(.*)$ public/$1 [L,QSA]
+
+# Disable directory browsing
+Options -Indexes
+>>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf

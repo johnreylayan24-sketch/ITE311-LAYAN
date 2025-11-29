@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
     "name": "codeigniter4/codeigniter4",
+=======
+    "name": "codeigniter4/framework",
+>>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
     "description": "The CodeIgniter framework v4",
     "license": "MIT",
     "type": "project",
@@ -17,6 +21,7 @@
         "psr/log": "^3.0"
     },
     "require-dev": {
+<<<<<<< HEAD
         "codeigniter/phpstan-codeigniter": "1.x-dev",
         "fakerphp/faker": "^1.24",
         "kint-php/kint": "^6.0",
@@ -33,6 +38,16 @@
     },
     "replace": {
         "codeigniter4/framework": "self.version"
+=======
+        "codeigniter/coding-standard": "^1.7",
+        "fakerphp/faker": "^1.24",
+        "friendsofphp/php-cs-fixer": "^3.47.1",
+        "kint-php/kint": "^6.0",
+        "mikey179/vfsstream": "^1.6.12",
+        "nexusphp/cs-config": "^3.6",
+        "phpunit/phpunit": "^10.5.16 || ^11.2",
+        "predis/predis": "^3.0"
+>>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
     },
     "suggest": {
         "ext-curl": "If you use CURLRequest class",
@@ -60,6 +75,7 @@
             "CodeIgniter\\": "system/"
         },
         "exclude-from-classmap": [
+<<<<<<< HEAD
             "**/Database/Migrations/**",
             "system/ThirdParty/**",
             "tests/system/Config/fixtures/**"
@@ -75,10 +91,17 @@
         "allow-plugins": {
             "phpstan/extension-installer": true
         },
+=======
+            "**/Database/Migrations/**"
+        ]
+    },
+    "config": {
+>>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
     },
+<<<<<<< HEAD
     "extra": {
         "branch-alias": {
             "dev-develop": "4.6.x-dev"
@@ -130,5 +153,9 @@
         "phpstan:baseline": "Run PHPStan then dump all errors to baseline",
         "phpstan:check": "Run PHPStan with support for identifiers",
         "test": "Run unit tests"
+=======
+    "scripts": {
+        "test": "phpunit"
+>>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
     }
 }

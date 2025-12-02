@@ -153,3 +153,77 @@ DEBUG - 2025-12-02 03:37:21 --> Session: Class initialized using '\Config\Custom
 DEBUG - 2025-12-02 03:37:22 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
 DEBUG - 2025-12-02 03:37:27 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
 DEBUG - 2025-12-02 03:37:27 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 04:38:59 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 05:08:01 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 05:08:04 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 05:12:40 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+WARNING - 2025-12-02 05:12:40 --> [DEPRECATED] md5(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\Auth.php on line 40.
+ 1 APPPATH\Controllers\Auth.php(40): md5(null)
+ 2 APPPATH\Controllers\Auth.php(26): App\Controllers\Auth->isUserLockedOut()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->login()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(68): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 9 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\ITE311-LAYAN\\public\\index.php')
+INFO - 2025-12-02 05:12:57 --> CSRF token verified.
+DEBUG - 2025-12-02 05:12:58 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+CRITICAL - 2025-12-02 05:12:58 --> ErrorException: Trying to access array offset on value of type null
+[Method: POST, Route: auth/login]
+in APPPATH\Controllers\Auth.php on line 65.
+ 1 APPPATH\Controllers\Auth.php(65): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Trying to access array offset on value of type null', 'C:\\xampp\\htdocs\\ITE311-LAYAN\\app\\Controllers\\Auth.php', 65)
+ 2 APPPATH\Controllers\Auth.php(126): App\Controllers\Auth->incrementLoginAttempts('Johnreylayan@gmail.com')
+ 3 APPPATH\Controllers\Auth.php(80): App\Controllers\Auth->handleLogin()
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->handleLoginAttempt()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(68): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\ITE311-LAYAN\\public\\index.php')
+DEBUG - 2025-12-02 05:13:03 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+WARNING - 2025-12-02 05:13:03 --> [DEPRECATED] md5(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\Auth.php on line 40.
+ 1 APPPATH\Controllers\Auth.php(40): md5(null)
+ 2 APPPATH\Controllers\Auth.php(26): App\Controllers\Auth->isUserLockedOut()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->login()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(68): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 9 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\ITE311-LAYAN\\public\\index.php')
+INFO - 2025-12-02 05:13:06 --> CSRF token verified.
+DEBUG - 2025-12-02 05:13:06 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+INFO - 2025-12-02 05:13:06 --> Security Event: {"event":"login_success","user_id":"9","email":"Johnreylayan@gmail.com","ip_address":"::1","user_agent":{},"timestamp":"2025-12-02 05:13:06"}
+DEBUG - 2025-12-02 05:13:06 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 05:13:19 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+INFO - 2025-12-02 05:13:19 --> Security Event: {"event":"logout","user_id":"9","email":"Johnreylayan@gmail.com","ip_address":"::1","user_agent":{},"timestamp":"2025-12-02 05:13:19"}
+DEBUG - 2025-12-02 05:13:19 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+WARNING - 2025-12-02 05:13:19 --> [DEPRECATED] md5(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\Auth.php on line 40.
+ 1 APPPATH\Controllers\Auth.php(40): md5(null)
+ 2 APPPATH\Controllers\Auth.php(26): App\Controllers\Auth->isUserLockedOut()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->login()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(68): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 9 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\ITE311-LAYAN\\public\\index.php')
+INFO - 2025-12-02 05:13:29 --> CSRF token verified.
+DEBUG - 2025-12-02 05:13:29 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+INFO - 2025-12-02 05:13:29 --> Security Event: {"event":"login_success","user_id":"11","email":"student@gmail.com","ip_address":"::1","user_agent":{},"timestamp":"2025-12-02 05:13:29"}
+DEBUG - 2025-12-02 05:13:29 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 05:13:38 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+INFO - 2025-12-02 05:13:38 --> Security Event: {"event":"logout","user_id":"11","email":"student@gmail.com","ip_address":"::1","user_agent":{},"timestamp":"2025-12-02 05:13:38"}
+DEBUG - 2025-12-02 05:13:39 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+WARNING - 2025-12-02 05:13:39 --> [DEPRECATED] md5(): Passing null to parameter #1 ($string) of type string is deprecated in APPPATH\Controllers\Auth.php on line 40.
+ 1 APPPATH\Controllers\Auth.php(40): md5(null)
+ 2 APPPATH\Controllers\Auth.php(26): App\Controllers\Auth->isUserLockedOut()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->login()
+ 4 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 5 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(68): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 9 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\ITE311-LAYAN\\public\\index.php')

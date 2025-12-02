@@ -6,6 +6,21 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Controllers\\Admin\\Dashboard' => $baseDir . '/app/Controllers/Admin/Dashboard.php',
+    'App\\Controllers\\Auth' => $baseDir . '/app/Controllers/Auth.php',
+    'App\\Controllers\\BaseController' => $baseDir . '/app/Controllers/BaseController.php',
+    'App\\Controllers\\Course' => $baseDir . '/app/Controllers/Course.php',
+    'App\\Controllers\\Dashboard' => $baseDir . '/app/Controllers/Dashboard.php',
+    'App\\Controllers\\Home' => $baseDir . '/app/Controllers/Home.php',
+    'App\\Controllers\\Student\\Dashboard' => $baseDir . '/app/Controllers/Student/Dashboard.php',
+    'App\\Controllers\\Teacher' => $baseDir . '/app/Controllers/Teacher.php',
+    'App\\Database\\Seeds\\AdminUserSeeder' => $baseDir . '/app/Database/Seeds/AdminUserSeeder.php',
+    'App\\Database\\Seeds\\CourseSeeder' => $baseDir . '/app/Database/Seeds/CourseSeeder.php',
+    'App\\Database\\Seeds\\UserSeeder' => $baseDir . '/app/Database/Seeds/UserSeeder.php',
+    'App\\Filters\\AuthFilter' => $baseDir . '/app/Filters/AuthFilter.php',
+    'App\\Filters\\RoleFilter' => $baseDir . '/app/Filters/RoleFilter.php',
+    'App\\Models\\EnrollmentModel' => $baseDir . '/app/Models/EnrollmentModel.php',
+    'App\\Models\\UserModel' => $baseDir . '/app/Models/UserModel.php',
     'CodeIgniter\\API\\ResponseTrait' => $baseDir . '/system/API/ResponseTrait.php',
     'CodeIgniter\\Autoloader\\Autoloader' => $baseDir . '/system/Autoloader/Autoloader.php',
     'CodeIgniter\\Autoloader\\FileLocator' => $baseDir . '/system/Autoloader/FileLocator.php',

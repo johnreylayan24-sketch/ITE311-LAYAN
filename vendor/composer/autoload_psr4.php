@@ -9,4 +9,5 @@ return array(
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
     'Laminas\\Escaper\\' => array($vendorDir . '/laminas/laminas-escaper/src'),
     'CodeIgniter\\' => array($baseDir . '/system'),
+    'App\\' => array($baseDir . '/app'),
 );

@@ -8,34 +8,31 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-<<<<<<< HEAD
-        // Simple user data
+        // User data with both admin and test accounts
         $users = [
             [
-                'name'     => 'Admin',
-                'email'    => 'admin@gmail.com',
-=======
-        $data = [
-            [
-                'name' => 'LAYANZZ',
-                'email' => 'LAYANJOHNRY@gmail.com',
->>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
+                'name' => 'LAYANZZ Admin',
+                'email' => 'Johnreylayan@gmail.com',
                 'password' => password_hash('admin123', PASSWORD_DEFAULT),
                 'role' => 'admin',
-                'created_at' => date('Y-m-d H:i:s')
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
             ],
             [
-<<<<<<< HEAD
-                'name'     => 'Teacher',
-                'email'    => 'teacher@gmail.com',
+                'name' => 'Teacher',
+                'email' => 'teacher@gmail.com',
                 'password' => password_hash('teacher123', PASSWORD_DEFAULT),
-                'role'     => 'teacher'
+                'role' => 'teacher',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
             ],
             [
-                'name'     => 'Student',
-                'email'    => 'student@gmail.com',
+                'name' => 'Student',
+                'email' => 'student@gmail.com',
                 'password' => password_hash('student123', PASSWORD_DEFAULT),
-                'role'     => 'student'
+                'role' => 'student',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
             ]
         ];
 
@@ -44,10 +41,14 @@ class UserSeeder extends Seeder
         
         // Insert each user
         foreach ($users as $user) {
-            // Add timestamps
-            $user['created_at'] = date('Y-m-d H:i:s');
-            $user['updated_at'] = date('Y-m-d H:i:s');
+            // Check if user already exists
+            $exists = $db->table('users')
+                       ->where('email', $user['email'])
+                       ->countAllResults();
             
+            if (!$exists) {
+                $db->table('users')->insert($user);
+            }
             // Check if user exists
             $exists = $db->table('users')
                        ->where('email', $user['email'])
@@ -61,21 +62,37 @@ class UserSeeder extends Seeder
             }
         }
         
-        echo "\nSeeding complete!\n";
-        echo "Admin: admin@example.com / admin123\n";
-        echo "Teacher: teacher@example.com / teacher123\n";
-        echo "Student: student@example.com / student123\n\n";
-=======
+        // Add additional test users
+        $additionalUsers = [
+            [
                 'name' => 'XYRL RACAZA',
                 'email' => 'RACAZA@gmail.com',
                 'password' => password_hash('2311600073', PASSWORD_DEFAULT),
                 'role' => 'student',
-                'created_at' => date('Y-m-d H:i:s')
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
             ]
         ];
-
-        // Insert multiple records
-        $this->db->table('users')->insertBatch($data);
->>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
+        
+        // Insert additional users
+        foreach ($additionalUsers as $user) {
+            $exists = $db->table('users')
+                       ->where('email', $user['email'])
+                       ->countAllResults() > 0;
+            
+            if (!$exists) {
+                $db->table('users')->insert($user);
+                echo "Additional user added: " . $user['email'] . "\n";
+            } else {
+                echo "Additional user exists: " . $user['email'] . "\n";
+            }
+        }
+        
+        echo "\nSeeding complete!\n";
+        echo "Admin: LAYANJOHNRY@gmail.com / admin123\n";
+        echo "Admin: admin@gmail.com / admin123\n";
+        echo "Teacher: teacher@gmail.com / teacher123\n";
+        echo "Student: student@gmail.com / student123\n";
+        echo "Student: RACAZA@gmail.com / 2311600073\n\n";
     }
 }

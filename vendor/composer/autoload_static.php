@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit8a735e5d0d8aaf0f81524643ab592485
+class ComposerStaticInit627168596307e5bda6b22b26a279b4a5
 {
     public static $prefixLengthsPsr4 = array (
         'P' => 
@@ -18,6 +18,10 @@ class ComposerStaticInit8a735e5d0d8aaf0f81524643ab592485
         'C' => 
         array (
             'CodeIgniter\\' => 12,
+        ),
+        'A' => 
+        array (
+            'App\\' => 4,
         ),
     );
 
@@ -34,9 +38,28 @@ class ComposerStaticInit8a735e5d0d8aaf0f81524643ab592485
         array (
             0 => __DIR__ . '/../..' . '/system',
         ),
+        'App\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/app',
+        ),
     );
 
     public static $classMap = array (
+        'App\\Controllers\\Admin\\Dashboard' => __DIR__ . '/../..' . '/app/Controllers/Admin/Dashboard.php',
+        'App\\Controllers\\Auth' => __DIR__ . '/../..' . '/app/Controllers/Auth.php',
+        'App\\Controllers\\BaseController' => __DIR__ . '/../..' . '/app/Controllers/BaseController.php',
+        'App\\Controllers\\Course' => __DIR__ . '/../..' . '/app/Controllers/Course.php',
+        'App\\Controllers\\Dashboard' => __DIR__ . '/../..' . '/app/Controllers/Dashboard.php',
+        'App\\Controllers\\Home' => __DIR__ . '/../..' . '/app/Controllers/Home.php',
+        'App\\Controllers\\Student\\Dashboard' => __DIR__ . '/../..' . '/app/Controllers/Student/Dashboard.php',
+        'App\\Controllers\\Teacher' => __DIR__ . '/../..' . '/app/Controllers/Teacher.php',
+        'App\\Database\\Seeds\\AdminUserSeeder' => __DIR__ . '/../..' . '/app/Database/Seeds/AdminUserSeeder.php',
+        'App\\Database\\Seeds\\CourseSeeder' => __DIR__ . '/../..' . '/app/Database/Seeds/CourseSeeder.php',
+        'App\\Database\\Seeds\\UserSeeder' => __DIR__ . '/../..' . '/app/Database/Seeds/UserSeeder.php',
+        'App\\Filters\\AuthFilter' => __DIR__ . '/../..' . '/app/Filters/AuthFilter.php',
+        'App\\Filters\\RoleFilter' => __DIR__ . '/../..' . '/app/Filters/RoleFilter.php',
+        'App\\Models\\EnrollmentModel' => __DIR__ . '/../..' . '/app/Models/EnrollmentModel.php',
+        'App\\Models\\UserModel' => __DIR__ . '/../..' . '/app/Models/UserModel.php',
         'CodeIgniter\\API\\ResponseTrait' => __DIR__ . '/../..' . '/system/API/ResponseTrait.php',
         'CodeIgniter\\Autoloader\\Autoloader' => __DIR__ . '/../..' . '/system/Autoloader/Autoloader.php',
         'CodeIgniter\\Autoloader\\FileLocator' => __DIR__ . '/../..' . '/system/Autoloader/FileLocator.php',
@@ -461,9 +484,9 @@ class ComposerStaticInit8a735e5d0d8aaf0f81524643ab592485
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit8a735e5d0d8aaf0f81524643ab592485::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit8a735e5d0d8aaf0f81524643ab592485::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit8a735e5d0d8aaf0f81524643ab592485::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit627168596307e5bda6b22b26a279b4a5::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit627168596307e5bda6b22b26a279b4a5::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit627168596307e5bda6b22b26a279b4a5::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -1,37 +1,81 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Models;
 
-use App\Models\EnrollmentModel;
-use CodeIgniter\Controller;
+use CodeIgniter\Model;
 
-class Course extends Controller
+class CourseModel extends Model
 {
-    public function enroll()
+    protected $table = 'courses';
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType = 'array';
+    protected $useSoftDeletes = false;
+    protected $allowedFields = ['title', 'description', 'instructor_id', 'status'];
+    protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    
+    /**
+     * Get all active courses
+     */
+    public function getActiveCourses()
     {
-        $session = session();
-
-        if (!$session->has('isLoggedIn') || !$session->get('isLoggedIn')) {
-            return $this->response->setStatusCode(401)
-                                  ->setJSON(['message' => 'Unauthorized']);
+        return $this->where('status', 'active')->findAll();
+    }
+    
+    /**
+     * Get courses by instructor
+     */
+    public function getInstructorCourses($instructorId)
+    {
+        return $this->where('instructor_id', $instructorId)
+                   ->findAll();
+    }
+    
+    /**
+     * Get course with enrolled students
+     */
+    public function getCourseWithStudents($courseId)
+    {
+        $db = \Config\Database::connect();
+        return $db->table('enrollments')
+                 ->select('enrollments.*, users.name as student_name, users.email as student_email')
+                 ->join('users', 'users.id = enrollments.user_id')
+                 ->where('enrollments.course_id', $courseId)
+                 ->get()
+                 ->getResultArray();
+    }
+    
+    /**
+     * Enroll a student in a course
+     */
+    public function enrollStudent($courseId, $userId)
+    {
+        $enrollmentModel = new \App\Models\EnrollmentModel();
+        
+        // Check if already enrolled
+        if ($enrollmentModel->where('user_id', $userId)
+                          ->where('course_id', $courseId)
+                          ->countAllResults() > 0) {
+            return false; // Already enrolled
         }
-
-        $course_id = $this->request->getPost('course_id');
-        $user_id = $session->get('user_id');
-
-        $enrollmentModel = new EnrollmentModel();
-
-        if (!is_numeric($course_id)) {
-            return $this->response->setStatusCode(400)
-                                  ->setJSON(['message' => 'Invalid course ID']);
-        }
-
-        if ($enrollmentModel->isAlreadyEnrolled($user_id, $course_id)) {
-            return $this->response->setJSON(['message' => 'Already enrolled']);
-        }
-
-        $enrollmentModel->enrollUser($user_id, $course_id);
-
-        return $this->response->setJSON(['message' => 'Enrollment successful']);
+        
+        $data = [
+            'course_id' => $courseId,
+            'user_id' => $userId,
+            'enrolled_at' => date('Y-m-d H:i:s'),
+            'status' => 'enrolled'
+        ];
+        
+        return $enrollmentModel->insert($data);
+    }
+    
+    /**
+     * Get course details by ID
+     */
+    public function getCourseDetails($courseId)
+    {
+        return $this->find($courseId);
     }
 }

@@ -1,0 +1,113 @@
+DEBUG - 2025-12-02 00:45:06 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 00:45:40 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:09:13 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:11:15 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:13:09 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:13:09 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:13:10 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:15:02 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:15:03 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:15:10 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:31:47 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:31:52 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:34:08 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:37:37 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:39:38 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:41:16 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:42:31 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:42:33 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:46:23 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:46:25 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:46:37 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:46:38 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:46:46 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:46:47 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:47:02 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:47:02 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:47:19 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:47:19 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:50:21 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:50:21 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:51:27 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:51:27 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:52:26 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:53:44 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:53:46 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 01:57:43 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:00:03 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:02:57 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:03:00 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:03:04 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:03:53 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:08:22 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:08:22 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+CRITICAL - 2025-12-02 02:08:22 --> ParseError: syntax error, unexpected token "elseif", expecting end of file
+[Method: GET, Route: dashboard]
+in APPPATH\Views\dashboard.php on line 313.
+ 1 SYSTEMPATH\View\View.php(229): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 2 SYSTEMPATH\Common.php(1167): CodeIgniter\View\View->render('dashboard', [], true)
+ 3 APPPATH\Controllers\Dashboard.php(62): view('dashboard', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Dashboard->index()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Dashboard))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(68): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\ITE311-LAYAN\\public\\index.php')
+DEBUG - 2025-12-02 02:10:07 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:14:05 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:14:10 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:15:20 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:15:20 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:15:30 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:15:30 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:25:23 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:25:23 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:28:27 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:28:29 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:28:46 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:28:47 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:30:51 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:30:51 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:31:06 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:31:06 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:31:08 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:31:08 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:31:23 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:31:23 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:32:09 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:32:17 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:32:18 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:32:35 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:32:35 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:34:48 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:35:04 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:35:04 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:37:40 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:37:40 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:43:38 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:43:47 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:43:49 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:44:05 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:44:05 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:44:11 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:44:11 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:44:21 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:44:21 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:45:35 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:45:41 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:45:42 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:45:49 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:45:49 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:46:39 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:47:37 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:47:39 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:47:41 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:47:41 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:47:58 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:47:59 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:48:02 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:48:02 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:48:19 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:48:19 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.
+DEBUG - 2025-12-02 02:49:42 --> Session: Class initialized using '\Config\CustomSessionHandler' driver.

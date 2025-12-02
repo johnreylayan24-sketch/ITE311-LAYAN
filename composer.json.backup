@@ -1,0 +1,17 @@
+echo { > composer.json
+echo     "name": "codeigniter4/appstarter", >> composer.json
+echo     "description": "CodeIgniter4 starter app", >> composer.json
+echo     "type": "project", >> composer.json
+echo     "require": { >> composer.json
+echo         "php": "^8.1", >> composer.json
+echo         "codeigniter4/framework": "^4.0", >> composer.json
+echo         "laminas/laminas-escaper": "^2.17", >> composer.json
+echo         "psr/log": "^3.0" >> composer.json
+echo     }, >> composer.json
+echo     "autoload": { >> composer.json
+echo         "psr-4": { >> composer.json
+echo             "App\\\\": "app/", >> composer.json
+echo             "CodeIgniter\\\\": "system/" >> composer.json
+echo         } >> composer.json
+echo     } >> composer.json
+echo } >> composer.json

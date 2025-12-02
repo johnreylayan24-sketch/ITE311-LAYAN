@@ -11,7 +11,6 @@ declare(strict_types=1);
  * the LICENSE file that was distributed with this source code.
  */
 
-<<<<<<< HEAD
 /**
  * ---------------------------------------------------------------
  * This file cannot be used. The code has moved to Boot.php.
@@ -159,16 +158,7 @@ if (! is_file(COMPOSER_PATH)) {
  * ---------------------------------------------------------------
  */
 
-Services::autoloader()->initializeKint(CI_DEBUG);
-
-exit(1);
-=======
-use CodeIgniter\Boot;
-use Config\Paths;
-
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
+// This file is no longer used. The code has been moved to CodeIgniter\Boot.
 
 /*
  * ---------------------------------------------------------------
@@ -239,5 +229,5 @@ Boot::bootTest($paths);
  * ---------------------------------------------------------------
  */
 
+// Load the routes
 service('routes')->loadRoutes();
->>>>>>> 37bee22 (Add database migrations and seeders)

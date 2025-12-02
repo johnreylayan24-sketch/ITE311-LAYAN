@@ -1,29 +1,23 @@
 <?php return array(
     'root' => array(
-        'name' => 'codeigniter4/codeigniter4',
+        'name' => 'codeigniter4/framework',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '69529d521fe5a9fe9a590929851d1c118c313c36',
+        'reference' => '2f07e7a64c340b2e6b65d74111d5a6ab09e0a477',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => false,
     ),
     'versions' => array(
-        'codeigniter4/codeigniter4' => array(
+        'codeigniter4/framework' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '69529d521fe5a9fe9a590929851d1c118c313c36',
+            'reference' => '2f07e7a64c340b2e6b65d74111d5a6ab09e0a477',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
-        ),
-        'codeigniter4/framework' => array(
-            'dev_requirement' => false,
-            'replaced' => array(
-                0 => 'dev-main',
-            ),
         ),
         'laminas/laminas-escaper' => array(
             'pretty_version' => '2.18.0',

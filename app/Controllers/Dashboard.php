@@ -2,79 +2,68 @@
 
 namespace App\Controllers;
 
-use App\Models\EnrollmentModel;
-use App\Models\CourseModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 
-class Dashboard extends Controller
+class Dashboard extends BaseController
 {
-    protected $enrollmentModel;
-    protected $courseModel;
-    protected $session;
-
-    public function __construct()
+    public function publicIndex()
     {
-        $this->enrollmentModel = new EnrollmentModel();
-        $this->courseModel = new CourseModel();
-        $this->session = session();
+        // Clear any existing session data to ensure clean login state
+        if (session()->get('isLoggedIn')) {
+            session()->destroy();
+        }
+        
+        // Show public dashboard with login prompt
+        return view('dashboard/public');
     }
 
-    // Default dashboard (redirect by role)
+    public function test()
+    {
+        return "Dashboard controller is working!";
+    }
+
     public function index()
     {
-        if (!$this->session->get('isLoggedIn')) {
-            return redirect()->to('/auth/login')->with('error', 'You must log in first.');
+        // Check if user is logged in
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/auth/login')
+                ->with('error', 'Please login first');
         }
 
-        $role = $this->session->get('user_role');
-        return redirect()->to("/dashboard/{$role}");
-    }
+        $role = strtolower(session()->get('role'));
+        
+        // Basic data structure that the dashboard view expects
+        $data = [
+            'title' => ucfirst($role) . ' Dashboard',
+            'user' => [
+                'id' => session()->get('user_id'),
+                'name' => session()->get('name'),
+                'role' => $role,
+                'email' => session()->get('email') ?? 'user@example.com'
+            ]
+        ];
 
-    // Admin dashboard
-    public function admin()
-    {
-        if (!$this->session->get('isLoggedIn') || $this->session->get('user_role') !== 'admin') {
-            return redirect()->to('/auth/login')->with('error', 'You must log in as an administrator.');
+        // Add role-specific features
+        if ($role === 'admin') {
+            $data['admin_features'] = [
+                'total_users' => 1,
+                'recent_activities' => [
+                    ['action' => 'System running', 'time' => 'Just now']
+                ]
+            ];
+        } elseif ($role === 'teacher') {
+            $data['teacher_features'] = [
+                'my_courses' => [],
+                'pending_submissions' => 0
+            ];
+        } elseif ($role === 'student') {
+            $data['student_features'] = [
+                'my_courses' => [],
+                'recent_grades' => []
+            ];
         }
 
-        return view('dashboard/admin', [
-            'title' => 'Admin Dashboard',
-            'user_name' => $this->session->get('user_name'),
-            'user_role' => $this->session->get('user_role')
-        ]);
-    }
-
-    // Teacher dashboard
-    public function teacher()
-    {
-        if (!$this->session->get('isLoggedIn') || $this->session->get('user_role') !== 'teacher') {
-            return redirect()->to('/auth/login')->with('error', 'You must log in as a teacher.');
-        }
-
-        return view('dashboard/teacher', [
-            'title' => 'Teacher Dashboard',
-            'user_name' => $this->session->get('user_name'),
-            'user_role' => $this->session->get('user_role')
-        ]);
-    }
-
-    // Student dashboard
-    public function student()
-    {
-        if (!$this->session->get('isLoggedIn') || $this->session->get('user_role') !== 'student') {
-            return redirect()->to('/auth/login')->with('error', 'You must log in as a student.');
-        }
-
-        $user_id = $this->session->get('user_id');
-        $enrollments = $this->enrollmentModel->where('student_id', $user_id)->findAll();
-        $courses = $this->courseModel->findAll();
-
-        return view('dashboard/student', [
-            'title' => 'Student Dashboard',
-            'user_name' => $this->session->get('user_name'),
-            'user_role' => $this->session->get('user_role'),
-            'enrollments' => $enrollments,
-            'courses' => $courses
-        ]);
+        // Load the dashboard view
+        return view('dashboard', $data);
     }
 }

@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-    "name": "codeigniter4/codeigniter4",
-=======
     "name": "codeigniter4/framework",
->>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
     "description": "The CodeIgniter framework v4",
     "license": "MIT",
     "type": "project",
@@ -21,33 +17,11 @@
         "psr/log": "^3.0"
     },
     "require-dev": {
-<<<<<<< HEAD
-        "codeigniter/phpstan-codeigniter": "1.x-dev",
         "fakerphp/faker": "^1.24",
         "kint-php/kint": "^6.0",
         "mikey179/vfsstream": "^1.6.12",
-        "nexusphp/tachycardia": "^2.0",
-        "phpstan/extension-installer": "^1.4",
-        "phpstan/phpstan": "^2.0",
-        "phpstan/phpstan-strict-rules": "^2.0",
-        "phpunit/phpcov": "^9.0.2 || ^10.0",
-        "phpunit/phpunit": "^10.5.16 || ^11.2",
-        "predis/predis": "^3.0",
-        "rector/rector": "2.1.2",
-        "shipmonk/phpstan-baseline-per-identifier": "^2.0"
-    },
-    "replace": {
-        "codeigniter4/framework": "self.version"
-=======
-        "codeigniter/coding-standard": "^1.7",
-        "fakerphp/faker": "^1.24",
-        "friendsofphp/php-cs-fixer": "^3.47.1",
-        "kint-php/kint": "^6.0",
-        "mikey179/vfsstream": "^1.6.12",
-        "nexusphp/cs-config": "^3.6",
         "phpunit/phpunit": "^10.5.16 || ^11.2",
         "predis/predis": "^3.0"
->>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
     },
     "suggest": {
         "ext-curl": "If you use CURLRequest class",
@@ -72,90 +46,16 @@
     },
     "autoload": {
         "psr-4": {
+            "App\\": "app/",
             "CodeIgniter\\": "system/"
-        },
-        "exclude-from-classmap": [
-<<<<<<< HEAD
-            "**/Database/Migrations/**",
-            "system/ThirdParty/**",
-            "tests/system/Config/fixtures/**"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "CodeIgniter\\": "tests/system/",
-            "Utils\\": "utils/src/"
         }
     },
     "config": {
-        "allow-plugins": {
-            "phpstan/extension-installer": true
-        },
-=======
-            "**/Database/Migrations/**"
-        ]
-    },
-    "config": {
->>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
     },
-<<<<<<< HEAD
-    "extra": {
-        "branch-alias": {
-            "dev-develop": "4.6.x-dev"
-        }
-    },
-    "scripts": {
-        "post-update-cmd": [
-            "CodeIgniter\\ComposerScripts::postUpdate"
-        ],
-        "post-autoload-dump": [
-            "@composer update --ansi --working-dir=utils"
-        ],
-        "analyze": [
-            "Composer\\Config::disableProcessTimeout",
-            "@phpstan:check",
-            "vendor/bin/rector process --dry-run"
-        ],
-        "cs": [
-            "Composer\\Config::disableProcessTimeout",
-            "utils/vendor/bin/php-cs-fixer check --ansi --verbose --diff --config=.php-cs-fixer.user-guide.php",
-            "utils/vendor/bin/php-cs-fixer check --ansi --verbose --diff --config=.php-cs-fixer.no-header.php",
-            "utils/vendor/bin/php-cs-fixer check --ansi --verbose --diff --config=.php-cs-fixer.tests.php",
-            "utils/vendor/bin/php-cs-fixer check --ansi --verbose --diff"
-        ],
-        "cs-fix": [
-            "Composer\\Config::disableProcessTimeout",
-            "utils/vendor/bin/php-cs-fixer fix --ansi --verbose --diff --config=.php-cs-fixer.user-guide.php",
-            "utils/vendor/bin/php-cs-fixer fix --ansi --verbose --diff --config=.php-cs-fixer.no-header.php",
-            "utils/vendor/bin/php-cs-fixer fix --ansi --verbose --diff --config=.php-cs-fixer.tests.php",
-            "utils/vendor/bin/php-cs-fixer fix --ansi --verbose --diff"
-        ],
-        "metrics": "utils/vendor/bin/phpmetrics --config=phpmetrics.json",
-        "phpstan:baseline": [
-            "bash -c \"rm -rf utils/phpstan-baseline/*.neon\"",
-            "bash -c \"touch utils/phpstan-baseline/loader.neon\"",
-            "phpstan analyse --ansi --generate-baseline=utils/phpstan-baseline/loader.neon",
-            "split-phpstan-baseline utils/phpstan-baseline/loader.neon"
-        ],
-        "phpstan:check": "vendor/bin/phpstan analyse --verbose --ansi",
-        "sa": "@analyze",
-        "style": "@cs-fix",
-        "test": "phpunit"
-    },
-    "scripts-descriptions": {
-        "analyze": "Run static analysis",
-        "cs": "Check the coding style",
-        "cs-fix": "Fix the coding style",
-        "metrics": "Run PhpMetrics",
-        "phpstan:baseline": "Run PHPStan then dump all errors to baseline",
-        "phpstan:check": "Run PHPStan with support for identifiers",
-        "test": "Run unit tests"
-=======
     "scripts": {
         "test": "phpunit"
->>>>>>> 9bc49831b38c627ac5b7e400f2b51d63a4e97daf
     }
 }
